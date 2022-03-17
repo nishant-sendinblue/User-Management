@@ -52,8 +52,8 @@ router.get("/get_user", auth, async (req, res) => {
 })
 router.get("/get_all_users", auth, async (req, res) => {
     let user = await userModel.find({}, { password: 0 });
-    let filteredUsers = user.filter(item => item.role != "admin");
-    res.status(200).send(filteredUsers);
+    // let filteredUsers = user.filter(item => item.role != "admin");
+    res.status(200).send(user);
 })
 router.put("/edit_user/:id", auth, async (req, res) => {
     try {

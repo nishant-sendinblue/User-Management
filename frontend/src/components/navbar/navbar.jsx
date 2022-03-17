@@ -6,6 +6,7 @@ import PersonOutlineTwoToneIcon from '@mui/icons-material/PersonOutlineTwoTone';
 import ManageAccountsTwoToneIcon from '@mui/icons-material/ManageAccountsTwoTone';
 import Avatar from '@mui/material/Avatar';
 import { blue } from '@mui/material/colors';
+import { Link } from "react-router-dom";
 
 function Navbar({ userData }) {
     const logoutHandler = () => {
@@ -22,7 +23,9 @@ function Navbar({ userData }) {
                             <Avatar style={{ marginRight: "5px" }} sx={{ bgcolor: blue[100], color: blue[600] }}>
                                 <PersonOutlineTwoToneIcon />
                             </Avatar>
-                            Welcome, {userData?.name}
+                            <Link to="/dashboard">
+                                Welcome, {userData?.name}
+                            </Link>
                         </p>
                         <Button onClick={logoutHandler} variant="outlined" color="info" startIcon={<LogoutTwoToneIcon />}>
                             Logout

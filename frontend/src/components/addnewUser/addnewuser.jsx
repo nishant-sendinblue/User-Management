@@ -5,6 +5,10 @@ import Button from '@mui/material/Button';
 import axios from 'axios'
 import { API_URL } from '../../config';
 import MenuItem from '@mui/material/MenuItem';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Slide from '@mui/material/Slide';
+import { useNavigate } from 'react-router-dom';
 
 function Addnewuser() {
     const [showError, setShowError] = useState(false);
@@ -13,7 +17,7 @@ function Addnewuser() {
         name: "",
         email: "",
         password: "",
-        role: ""
+        role: "user"
     })
 
     const changeHandler = (e) => {
@@ -23,14 +27,13 @@ function Addnewuser() {
             [e.target.name]: e.target.value,
         })
     }
-
+    let navigate = useNavigate();
     const submitHandler = async (e) => {
         e.preventDefault()
         try {
-            let res = await axios.post(`${API_URL}/login`, state);
-            if (res?.data?.token) {
-                localStorage.setItem("token", res?.data?.token);
-                window.location = "/dashboard";
+            let res = await axios.post(`${API_URL}/create_user`, state);
+            if (res.data) {
+                navigate("/dashboard")
             }
         } catch (error) {
             seterrorMsg(error?.response?.data?.message);

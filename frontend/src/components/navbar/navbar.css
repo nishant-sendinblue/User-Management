@@ -8,7 +8,7 @@
 .navbar #name {
   font-size: 20px;
   text-transform: uppercase;
-  color: #1976d2;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -20,4 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+#name a {
+  color: #1976d2;
 }
