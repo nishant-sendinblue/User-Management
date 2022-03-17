@@ -72,12 +72,17 @@ function Dashboard({ token, userData }) {
                                         <Link to={`/view_user/${item._id}`} >
                                             <VisibilityTwoToneIcon color='primary' />
                                         </Link>
-                                        <Link to={`/edit_user/${item._id}`}>
-                                            <ModeEditTwoToneIcon color='success' />
-                                        </Link>
-                                        <span>
-                                            <DeleteTwoToneIcon color='error' />
-                                        </span>
+                                        {
+                                            item.role === "user" &&
+                                            <>
+                                                <Link to={`/edit_user/${item._id}`}>
+                                                    <ModeEditTwoToneIcon color='success' />
+                                                </Link>
+                                                <span>
+                                                    <DeleteTwoToneIcon color='error' />
+                                                </span>
+                                            </>
+                                        }
                                     </td>
                                 </tr>
                             ))
