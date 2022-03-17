@@ -48,3 +48,8 @@ td span {
 #role {
   text-transform: capitalize;
 }
+.aboveTable {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

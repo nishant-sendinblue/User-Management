@@ -21,7 +21,6 @@ router.post("/create_user", async (req, res) => {
         email: req.body.email,
         password: hassedPassword,
         role: req.body.role,
-        status: req.body.status
     });
     try {
         const savedUser = await user.save();
@@ -56,7 +55,23 @@ router.get("/get_all_users", auth, async (req, res) => {
     let filteredUsers = user.filter(item => item.role != "admin");
     res.status(200).send(filteredUsers);
 })
-
-
+router.put("/edit_user/:id", auth, async (req, res) => {
+    try {
+        let updatedUser = await userModel.findByIdAndUpdate({ _id: req.params.id }, req.body, { new: true });
+        res.json(updatedUser);
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+router.delete('/delete_user/:id', auth, async (req, res) => {
+    try {
+        await userModel.deleteOne({ _id: req.params.id });
+        const Users = await userModel.find({});
+        let filteredUsers = Users.filter(item => item.role != "admin");
+        res.json(filteredUsers);
+    } catch (error) {
+        res.status(400).send(error)
+    }
+});
 
 module.exports = router;

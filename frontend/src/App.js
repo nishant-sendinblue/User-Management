@@ -8,6 +8,7 @@ import Navbar from './components/navbar/navbar';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API_URL } from './config';
+import Addnewuser from './components/addnewUser/addnewuser';
 function App() {
   const [userData, setuserData] = useState()
   let token = localStorage.getItem("token");
@@ -38,6 +39,7 @@ function App() {
       <Routes>
         <Route exact path='/' element={<PrivateRoute path="/" component={<Adminlogin />} />} />
         <Route exact path="/dashboard" element={<PrivateRoute path="/dashboard" component={<Dashboard token={token} userData={userData} />} />} />
+        <Route exact path="/add_new_user" element={<PrivateRoute path="/add_new_user" component={<Addnewuser token={token} userData={userData} />} />} />
       </Routes>
     </Router>
   );

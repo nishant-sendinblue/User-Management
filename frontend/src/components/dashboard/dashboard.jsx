@@ -8,11 +8,12 @@ import FiberManualRecordTwoToneIcon from '@mui/icons-material/FiberManualRecordT
 import axios from 'axios';
 import { API_URL } from '../../config';
 import { useState } from 'react';
+import Button from '@mui/material/Button';
+import PersonAddAltTwoToneIcon from '@mui/icons-material/PersonAddAltTwoTone';
 
 function Dashboard({ token, userData }) {
 
     const [users, setUsers] = useState([]);
-
     useEffect(() => {
         const fetchAllUsers = async () => {
             try {
@@ -21,7 +22,6 @@ function Dashboard({ token, userData }) {
                         Authorization: token
                     }
                 })
-                console.log(res)
                 if (res.data) {
                     setUsers(res.data);
                 }
@@ -31,10 +31,18 @@ function Dashboard({ token, userData }) {
         }
         fetchAllUsers();
     }, [])
+
     return (
         <div className='dashContainer'>
             <div className='innerDashContent'>
-                <h3>Users</h3>
+                <div className='aboveTable'>
+                    <h3 style={{ color: "#1976d2" }}>Users</h3>
+                    <Link to={"/add_new_user"}>
+                        <Button variant="outlined" startIcon={<PersonAddAltTwoToneIcon />}>
+                            Add User
+                        </Button>
+                    </Link>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -61,10 +69,10 @@ function Dashboard({ token, userData }) {
                                     }
                                     <td id='role'>{item.role}</td>
                                     <td>
-                                        <Link to="/view_user">
+                                        <Link to={`/view_user/${item._id}`} >
                                             <VisibilityTwoToneIcon color='primary' />
                                         </Link>
-                                        <Link to="/edit_user">
+                                        <Link to={`/edit_user/${item._id}`}>
                                             <ModeEditTwoToneIcon color='success' />
                                         </Link>
                                         <span>

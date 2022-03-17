@@ -4,6 +4,8 @@ import LogoutTwoToneIcon from '@mui/icons-material/LogoutTwoTone';
 import Button from '@mui/material/Button';
 import PersonOutlineTwoToneIcon from '@mui/icons-material/PersonOutlineTwoTone';
 import ManageAccountsTwoToneIcon from '@mui/icons-material/ManageAccountsTwoTone';
+import Avatar from '@mui/material/Avatar';
+import { blue } from '@mui/material/colors';
 
 function Navbar({ userData }) {
     const logoutHandler = () => {
@@ -16,7 +18,12 @@ function Navbar({ userData }) {
             {
                 userData?.email ?
                     <div className="navbar">
-                        <p id="name"><PersonOutlineTwoToneIcon />Welcome, {userData?.name}</p>
+                        <p id="name">
+                            <Avatar style={{ marginRight: "5px" }} sx={{ bgcolor: blue[100], color: blue[600] }}>
+                                <PersonOutlineTwoToneIcon />
+                            </Avatar>
+                            Welcome, {userData?.name}
+                        </p>
                         <Button onClick={logoutHandler} variant="outlined" color="info" startIcon={<LogoutTwoToneIcon />}>
                             Logout
                         </Button>
