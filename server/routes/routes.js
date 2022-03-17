@@ -55,7 +55,15 @@ router.get("/get_all_users", auth, async (req, res) => {
     // let filteredUsers = user.filter(item => item.role != "admin");
     res.status(200).send(user);
 })
-router.put("/edit_user/:id", auth, async (req, res) => {
+router.get("/view_user/:id", auth, async (req, res) => {
+    try {
+        let user = await userModel.findOne({ _id: req.params.id }, { password: 0 });
+        res.json(user);
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
+router.patch("/edit_user/:id", auth, async (req, res) => {
     try {
         let updatedUser = await userModel.findByIdAndUpdate({ _id: req.params.id }, req.body, { new: true });
         res.json(updatedUser);
@@ -66,9 +74,8 @@ router.put("/edit_user/:id", auth, async (req, res) => {
 router.delete('/delete_user/:id', auth, async (req, res) => {
     try {
         await userModel.deleteOne({ _id: req.params.id });
-        const Users = await userModel.find({});
-        let filteredUsers = Users.filter(item => item.role != "admin");
-        res.json(filteredUsers);
+        const Users = await userModel.find({}, { password: 0 });
+        res.json(Users);
     } catch (error) {
         res.status(400).send(error)
     }
