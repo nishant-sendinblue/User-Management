@@ -10,10 +10,18 @@ import { API_URL } from '../../config';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import PersonAddAltTwoToneIcon from '@mui/icons-material/PersonAddAltTwoTone';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { NotificationManager } from 'react-notifications';
 
 function Dashboard({ token, userData }) {
 
+    const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
+    const [userId, setUserId] = useState()
     useEffect(() => {
         const fetchAllUsers = async () => {
             try {
@@ -26,14 +34,65 @@ function Dashboard({ token, userData }) {
                     setUsers(res.data);
                 }
             } catch (error) {
-                console.log(error);
+                NotificationManager.error(" Some Error Occured!", "Error", 5000)
+                throw Error(error);
             }
         }
         fetchAllUsers();
     }, [])
 
+    const handleDeleteUser = (id) => {
+        setOpenDialog(true);
+        setUserId(id);
+    }
+    const handleClose = () => {
+        setOpenDialog(false);
+    };
+    const handleDisagree = () => {
+        setOpenDialog(false);
+    }
+    const handleAgree = async () => {
+        try {
+            let res = await axios.delete(`${API_URL}/delete_user/${userId}`, {
+                headers: {
+                    authorization: token
+                }
+            })
+            if (res.data) {
+                setUsers(res.data);
+                setOpenDialog(false);
+                NotificationManager.success(" User Deleted Successfully.", "Success", 5000)
+            }
+        }
+        catch (error) {
+            NotificationManager.error(" Some Error Occured!", "Error", 5000)
+            throw Error(error);
+        }
+    }
+
     return (
         <div className='dashContainer'>
+            <Dialog
+                open={oepnDialog}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    {"Are you sure?"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        On agree, user will be deleted permanently!
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDisagree}>Disagree</Button>
+                    <Button onClick={handleAgree} autoFocus>
+                        Agree
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <div className='innerDashContent'>
                 <div className='aboveTable'>
                     <h3 style={{ color: "#1976d2" }}>Users</h3>
@@ -78,7 +137,7 @@ function Dashboard({ token, userData }) {
                                                 <Link to={`/edit_user/${item._id}`}>
                                                     <ModeEditTwoToneIcon color='success' />
                                                 </Link>
-                                                <span>
+                                                <span onClick={() => handleDeleteUser(item._id)}>
                                                     <DeleteTwoToneIcon color='error' />
                                                 </span>
                                             </>
