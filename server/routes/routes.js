@@ -50,11 +50,32 @@ router.get("/get_user", auth, async (req, res) => {
     let user = await userModel.findOne({ _id: req.user }, { name: 1, email: 1 })
     res.status(200).send(user);
 })
-router.get("/get_all_users", auth, async (req, res) => {
-    let user = await userModel.find({}, { password: 0 });
-    // let filteredUsers = user.filter(item => item.role != "admin");
-    res.status(200).send(user);
-})
+
+router.get("/users", auth, paginatedResults(), (req, res) => {
+    res.json(res.paginatedResults);
+});
+
+function paginatedResults() {
+    return async (req, res, next) => {
+        const page = parseInt(req.query.page);
+        const limit = parseInt(req.query.limit);
+        const skipIndex = (page - 1) * limit;
+        try {
+            let allUsers = await userModel.find({}, { password: 0 })
+            let results = await userModel.find({}, { password: 0 })
+                .sort({ _id: 1 })
+                .limit(limit)
+                .lean()
+                .skip(skipIndex)
+                .exec();
+            res.paginatedResults = { results: results, allUsers: allUsers };
+            next();
+        } catch (e) {
+            res.status(500).json({ message: "Error Occured" });
+        }
+    };
+}
+
 router.get("/view_user/:id", auth, async (req, res) => {
     try {
         let user = await userModel.findOne({ _id: req.params.id }, { password: 0 });
@@ -80,5 +101,21 @@ router.delete('/delete_user/:id', auth, async (req, res) => {
         res.status(400).send(error)
     }
 });
+
+router.get("/get_users_by_date_range", auth, async (req, res) => {
+    try {
+        const startDate = req.query.startDate;
+        const endDate = req.query.endDate;
+        let results = await userModel.find({
+            createdAt: {
+                $gte: startDate,
+                $lte: endDate
+            }
+        }).lean()
+        res.json(results);
+    } catch (error) {
+        res.status(400).send(error)
+    }
+})
 
 module.exports = router;

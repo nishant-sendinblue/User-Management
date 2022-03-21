@@ -1,5 +1,5 @@
 .dashContainer {
-  height: 100vh;
+  height: max-content;
   width: 100%;
 }
 table {
@@ -48,8 +48,53 @@ td span {
 #role {
   text-transform: capitalize;
 }
-.aboveTable {
+.aboveTable,
+.child2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.child2 span {
+  margin-right: 10px;
+}
+.child2 .dateField {
+  height: 10%;
+}
+.pagination {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 0;
+}
+.searchContainer {
+  margin-right: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(25, 118, 210, 0.5);
+  padding: 1px;
+}
+
+.searchContainer .inputDiv {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  color: #1976d2;
+  width: 100px;
+  padding: 0 5px;
+  transition: all 0.2s;
+}
+.MuiInputBase-input {
+  width: 100px;
+  overflow: hidden;
+}
+.MuiInputBase-input:focus {
+  width: 150px;
+  transition: 0.2s;
+}
+.inputDiv:focus-within {
+  width: 170px;
+}
+::placeholder {
+  color: #1976d2 !important;
 }

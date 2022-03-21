@@ -100,6 +100,7 @@ function Edituser({ token }) {
                     required={true}
                     type="text"
                     className='txtField'
+                    disabled={state?.role === "admin"}
                     onChange={changeHandler}
                     value={state?.status}
                     label="Status"

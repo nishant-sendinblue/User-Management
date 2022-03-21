@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import './dashboard.css'
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import ModeEditTwoToneIcon from '@mui/icons-material/ModeEditTwoTone';
@@ -16,29 +16,24 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { NotificationManager } from 'react-notifications';
+import Pagination from '@mui/material/Pagination';
+import FilterbyDate from '../filterbyDate/filterbyDate';
+import SearchIcon from '@mui/icons-material/Search';
+import InputBase from '@mui/material/InputBase';
+import debouce from "lodash.debounce";
 
-function Dashboard({ token, userData }) {
+function Dashboard({ token }) {
 
     const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
+    let listToDisplay = users;
+    const [page, setPages] = useState(0);
+    const [currentPage, setcurrentPage] = useState(1);
+    const indexOfLastPost = currentPage * 6;
+    const indexofFirstPost = indexOfLastPost - 6;
     const [userId, setUserId] = useState()
     useEffect(() => {
-        const fetchAllUsers = async () => {
-            try {
-                let res = await axios.get(`${API_URL}/get_all_users`, {
-                    headers: {
-                        Authorization: token
-                    }
-                })
-                if (res.data) {
-                    setUsers(res.data);
-                }
-            } catch (error) {
-                NotificationManager.error(" Some Error Occured!", "Error", 5000)
-                throw Error(error);
-            }
-        }
-        fetchAllUsers();
+        getData(currentPage);
     }, [])
 
     const handleDeleteUser = (id) => {
@@ -69,6 +64,40 @@ function Dashboard({ token, userData }) {
             throw Error(error);
         }
     }
+    const handleChangePage = (event, value) => {
+        setcurrentPage(value);
+        getData(value);
+    };
+    const getData = async (curPage) => {
+        try {
+            let res = await axios.get(`${API_URL}/users?page=${curPage}&limit=6`, {
+                headers: {
+                    authorization: token
+                }
+            })
+            if (res.data) {
+                setUsers(res.data.results);
+                setPages(Math.ceil(res.data?.allUsers.length / 6));
+            }
+        }
+        catch (error) {
+            NotificationManager.error(" Some Error Occured!", "Error", 5000)
+            throw Error(error);
+        }
+    }
+    // for searching user
+    const [query, setQuery] = useState("");
+    const handleSearch = (e) => {
+        setQuery(e.target.value);
+    }
+    if (query !== "") {
+        listToDisplay = users.filter((item) => {
+            return item?.name.toLowerCase().includes(query.toLowerCase());
+        });
+    }
+    const debouncedResults = useMemo(() => {
+        return debouce(handleSearch, 300);
+    }, []);
 
     return (
         <div className='dashContainer'>
@@ -93,14 +122,37 @@ function Dashboard({ token, userData }) {
                     </Button>
                 </DialogActions>
             </Dialog>
+
             <div className='innerDashContent'>
                 <div className='aboveTable'>
-                    <h3 style={{ color: "#1976d2" }}>Users</h3>
-                    <Link to={"/add_new_user"}>
-                        <Button variant="outlined" startIcon={<PersonAddAltTwoToneIcon />}>
-                            Add User
-                        </Button>
-                    </Link>
+                    <div className='child1'>
+                        <h3 style={{
+                            color: "#1976d2", textTransform: "uppercase"
+                        }}>Users</h3>
+                    </div>
+                    <div className='child2'>
+                        {/* for searching user */}
+                        <div className='searchContainer'>
+                            <div className='inputDiv' >
+                                <div className='iconWrapper'>
+                                    <SearchIcon
+                                    />
+                                </div>
+                                <InputBase
+                                    placeholder="Search…"
+                                    onChange={debouncedResults}
+                                    inputProps={{ 'aria-label': 'search' }}
+                                />
+                            </div>
+                        </div>
+                        {/* for searching user end */}
+                        <FilterbyDate token={token} setUsers={setUsers} setPages={setPages} page={currentPage} />
+                        < Link to={"/add_new_user"} >
+                            <Button variant="outlined" startIcon={<PersonAddAltTwoToneIcon />}>
+                                Add User
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
                 <table>
                     <thead>
@@ -115,43 +167,53 @@ function Dashboard({ token, userData }) {
                     </thead>
                     <tbody>
                         {
-                            users.length > 0 &&
-                            users.map((item, index) => (
-                                <tr key={item._id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.email}</td>
-                                    {item.status === "active" ?
-                                        <td id='active'><FiberManualRecordTwoToneIcon color='success' fontSize="10" />Active </td>
-                                        :
-                                        <td id='active'><FiberManualRecordTwoToneIcon color='error' fontSize="10" />InActive </td>
-                                    }
-                                    <td id='role'>{item.role}</td>
-                                    <td>
-                                        <Link to={`/view_user/${item._id}`} >
-                                            <VisibilityTwoToneIcon color='primary' />
-                                        </Link>
-                                        {
-                                            item.role === "user" &&
-                                            <>
-                                                <Link to={`/edit_user/${item._id}`}>
-                                                    <ModeEditTwoToneIcon color='success' />
-                                                </Link>
-                                                <span onClick={() => handleDeleteUser(item._id)}>
-                                                    <DeleteTwoToneIcon color='error' />
-                                                </span>
-                                            </>
+                            listToDisplay.length > 0 ?
+                                listToDisplay.map((item, index) => (
+                                    <tr key={item._id}>
+                                        <td>{indexofFirstPost + index + 1}</td>
+                                        <td>{item.name}</td>
+                                        <td>{item.email}</td>
+                                        {item.status === "active" ?
+                                            <td id='active'><FiberManualRecordTwoToneIcon color='success' fontSize="10" />Active </td>
+                                            :
+                                            <td id='active'><FiberManualRecordTwoToneIcon color='error' fontSize="10" />InActive </td>
                                         }
-                                    </td>
+                                        <td id='role'>{item.role}</td>
+                                        <td>
+                                            <Link to={`/view_user/${item._id}`} >
+                                                <VisibilityTwoToneIcon color='primary' />
+                                            </Link>
+                                            {
+                                                item.role === "user" &&
+                                                <>
+                                                    <Link to={`/edit_user/${item._id}`}>
+                                                        <ModeEditTwoToneIcon color='success' />
+                                                    </Link>
+                                                    <span onClick={() => handleDeleteUser(item._id)}>
+                                                        <DeleteTwoToneIcon color='error' />
+                                                    </span>
+                                                </>
+                                            }
+                                        </td>
+                                    </tr>
+                                ))
+                                :
+                                <tr>
+                                    <td>No Data to Show!</td>
                                 </tr>
-                            ))
                         }
 
 
                     </tbody>
                 </table>
+                {
+                    page > 1 &&
+                    <div className="pagination">
+                        <Pagination count={page} variant="text" page={currentPage} onChange={handleChangePage} color="primary" />
+                    </div>
+                }
             </div>
-        </div>
+        </div >
     )
 }
 
