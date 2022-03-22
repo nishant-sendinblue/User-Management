@@ -21,11 +21,13 @@ import FilterbyDate from '../filterbyDate/filterbyDate';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import debouce from "lodash.debounce";
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 
 function Dashboard({ token }) {
 
     const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
+    const [searchByid, setSearchByid] = useState("");
     let listToDisplay = users;
     const [page, setPages] = useState(0);
     const [currentPage, setcurrentPage] = useState(1);
@@ -99,6 +101,30 @@ function Dashboard({ token }) {
         return debouce(handleSearch, 300);
     }, []);
 
+    const handleUserSearchById = async () => {
+        try {
+            let res = await axios.get(`${API_URL}/get_user_by_id/${searchByid}`, {
+                headers: {
+                    authorization: token
+                }
+            })
+            if (res?.data) {
+                setUsers([res?.data]);
+                setPages(0);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleSearchByIdChange = (e) => {
+        setSearchByid(e.target.value);
+        if (e.target.value === "") {
+            getData();
+        }
+    }
+
+
     return (
         <div className='dashContainer'>
             <Dialog
@@ -129,6 +155,11 @@ function Dashboard({ token }) {
                         <h3 style={{
                             color: "#1976d2", textTransform: "uppercase"
                         }}>Users</h3>
+                        <div className='searchById'>
+                            <input onChange={handleSearchByIdChange} type="search" placeholder="Search by Id...">
+                            </input>
+                            <PersonSearchIcon onClick={handleUserSearchById} fontSize="medium" style={{ color: "#1976d2", cursor: "pointer", marginLeft: "-30px" }} />
+                        </div>
                     </div>
                     <div className='child2'>
                         {/* for searching user */}
