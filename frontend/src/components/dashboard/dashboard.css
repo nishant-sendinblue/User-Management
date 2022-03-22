@@ -49,7 +49,8 @@ td span {
   text-transform: capitalize;
 }
 .aboveTable,
-.child2 {
+.child2,
+.child1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -97,4 +98,19 @@ td span {
 }
 ::placeholder {
   color: #1976d2 !important;
+  opacity: 0.7;
+}
+.searchById {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+}
+.searchById > input {
+  outline: none;
+  border: 1px solid rgba(25, 118, 210, 0.5);
+  height: 35px;
+  font-size: 16px;
+  border-radius: 3px;
+  background-color: rgb(242, 255, 255);
+  padding: 0 32px 0 5px;
 }

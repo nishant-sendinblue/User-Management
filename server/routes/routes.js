@@ -1,56 +1,19 @@
 const router = require("express").Router();
-const bcrypt = require("bcrypt")
 const userModel = require("../models/userModel");
-const jwt = require("jsonwebtoken");
-const auth = require("./auth_middleware");
+const auth = require("../middleware/auth_middleware");
+const AuthController = require("../controllers/authController");
+const GetUserController = require("../controllers/getUserController");
 
+//api to create new user
+router.post("/create_user", AuthController.createUser);
+//login api for admin
+router.post("/login", AuthController.Login);
+//api to get user from token and auth Middleware (to know which user is currently logged in)
+router.get("/get_user", auth, GetUserController.getUserFromToken)
+//api to get user by id
+router.get("/get_user_by_id/:id", auth, GetUserController.getUserById)
 
-router.post("/create_user", async (req, res) => {
-    let emailExist = await userModel.findOne({ email: req.body.email });
-    if (emailExist) {
-        return res.status(409).json({ message: 'Email is already exist...!' });
-    }
-    if (!req.body.password) {
-        return res.status(400).json({ message: 'Password is required!' });
-    }
-    //bcrypt the password basically into hash format for security reasons
-    const salt = await bcrypt.genSalt(10);
-    const hassedPassword = await bcrypt.hash(req.body.password, salt);
-    const user = new userModel({
-        name: req.body.name,
-        email: req.body.email,
-        password: hassedPassword,
-        role: req.body.role,
-    });
-    try {
-        const savedUser = await user.save();
-        res.json(savedUser);
-    } catch (err) {
-        res.status(400).json(err);
-    }
-});
-router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-    let user = await userModel.findOne({ email: email });
-    if (!user) {
-        return res.status(400).json({ message: 'Email or Password is Wrong' });
-    }
-    if (user?.role == "admin") {
-        const validPass = await bcrypt.compare(password, user.password);
-        if (!validPass) {
-            return res.status(400).json({ message: 'Invalid Password or Email' });
-        }
-        const token = jwt.sign({ id: user._id }, 'NishantSecretKey');
-        res.json({ token: token, user: { name: user.name, email: user.email }, message: "Login Successful" });
-    } else {
-        res.status(404).json({ message: "Not Authorized!" })
-    }
-});
-router.get("/get_user", auth, async (req, res) => {
-    let user = await userModel.findOne({ _id: req.user }, { name: 1, email: 1 })
-    res.status(200).send(user);
-})
-
+//api to get users according to pagination or page limit
 router.get("/users", auth, paginatedResults(), (req, res) => {
     res.json(res.paginatedResults);
 });
@@ -75,47 +38,11 @@ function paginatedResults() {
         }
     };
 }
-
-router.get("/view_user/:id", auth, async (req, res) => {
-    try {
-        let user = await userModel.findOne({ _id: req.params.id }, { password: 0 });
-        res.json(user);
-    } catch (error) {
-        res.status(400).send(error)
-    }
-})
-router.patch("/edit_user/:id", auth, async (req, res) => {
-    try {
-        let updatedUser = await userModel.findByIdAndUpdate({ _id: req.params.id }, req.body, { new: true });
-        res.json(updatedUser);
-    } catch (error) {
-        res.status(400).send(error)
-    }
-})
-router.delete('/delete_user/:id', auth, async (req, res) => {
-    try {
-        await userModel.deleteOne({ _id: req.params.id });
-        const Users = await userModel.find({}, { password: 0 });
-        res.json(Users);
-    } catch (error) {
-        res.status(400).send(error)
-    }
-});
-
-router.get("/get_users_by_date_range", auth, async (req, res) => {
-    try {
-        const startDate = req.query.startDate;
-        const endDate = req.query.endDate;
-        let results = await userModel.find({
-            createdAt: {
-                $gte: startDate,
-                $lte: endDate
-            }
-        }).lean()
-        res.json(results);
-    } catch (error) {
-        res.status(400).send(error)
-    }
-})
+//update user by Id api
+router.patch("/edit_user/:id", auth, GetUserController.updateUserById);
+//delete user by Id api
+router.delete('/delete_user/:id', auth, GetUserController.deleteUserById);
+//filter users by date range (when user is created)
+router.get("/get_users_by_date_range", auth, GetUserController.filterUserByDate)
 
 module.exports = router;
