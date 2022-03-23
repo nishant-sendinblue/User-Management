@@ -156,7 +156,7 @@ function Dashboard({ token }) {
                             color: "#1976d2", textTransform: "uppercase"
                         }}>Users</h3>
                         <div className='searchById'>
-                            <input onChange={handleSearchByIdChange} type="search" placeholder="Search by Id...">
+                            <input onChange={handleSearchByIdChange} type="search" placeholder="Search by _id...">
                             </input>
                             <PersonSearchIcon onClick={handleUserSearchById} fontSize="medium" style={{ color: "#1976d2", cursor: "pointer", marginLeft: "-30px" }} />
                         </div>
