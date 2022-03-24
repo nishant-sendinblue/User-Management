@@ -47,6 +47,9 @@ function FilterbyDate({ token, setUsers, setPages }) {
     const handleClose = () => {
         setOpenPicker(false)
     }
+    const handleDateChange = (item) => {
+        setState([item.selection])
+    }
     return (
         <div>
             <Modal
@@ -55,7 +58,7 @@ function FilterbyDate({ token, setUsers, setPages }) {
             >
                 <Box sx={style}>
                     <DateRangePicker
-                        onChange={item => setState([item.selection])}
+                        onChange={handleDateChange}
                         months={1}
                         ranges={state}
                         showPreview={true}
