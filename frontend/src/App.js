@@ -11,17 +11,18 @@ import { API_URL } from './config';
 import Addnewuser from './components/addnewUser/addnewuser';
 import Viewuser from './components/viewUser/viewuser';
 import Edituser from './components/editUser/edituser';
+
 function App() {
   const [userData, setuserData] = useState()
   let token = localStorage.getItem("token");
-
+  console.log(token);
   useEffect(() => {
     if (token) {
       //fetching LoggedIn user data
       const fetchData = async () => {
         let res = await axios.get(`${API_URL}/get_user`, {
           headers: {
-            "Authorization": token
+            "authorization": token
           }
         })
         if (res?.data?.email) {

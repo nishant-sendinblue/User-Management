@@ -21,7 +21,7 @@ function Edituser({ token }) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                let resData = await axios.get(`${API_URL}/view_user/${params?.id}`, {
+                let resData = await axios.get(`${API_URL}/get_user_by_id/${params?.id}`, {
                     headers: {
                         Authorization: token
                     }
