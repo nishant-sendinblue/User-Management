@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  #rabbit mq
+  rabbitmq:
+    image: rabbitmq
+    ports:
+        - 5672:5672
+        - 15672:15672
+  # #redis
+  redis-server: 
+    restart: always
+    image: redis:6.0-alpine
+    volumes:
+      - ./server/redis-volume:/data
+    ports:
+      - '6379:6379'
+    # expose:
+    #   - 6379
+  #frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+  
+  # backend
+  server:
+    build: ./server
+    environment:
+      MONGO_URI: mongodb://mongo:27017/user_management
+      REDIS_URL: redis://redis-server:6379
+      RMQ_URL: amqp://rabbitmq:5672
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongo
+      - redis-server
+      - rabbitmq
+  
+
+  #mongo
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - mongo:/data/db
+    ports:
+      - '27017:27017'
+
+volumes:
+  mongo: {}
+  

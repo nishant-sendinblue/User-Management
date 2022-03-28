@@ -1,6 +1,7 @@
 const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const ProduceMsg = require("../rabbitmq/producer");
 
 const createUser = async (req, res) => {
     let emailExist = await userModel.findOne({ email: req.body.email });
@@ -21,6 +22,7 @@ const createUser = async (req, res) => {
     });
     try {
         const savedUser = await user.save();
+        ProduceMsg(savedUser?.email);
         res.json(savedUser);
     } catch (err) {
         res.status(400).json(err);

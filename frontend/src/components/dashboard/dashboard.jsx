@@ -56,7 +56,9 @@ function Dashboard({ token }) {
                 }
             })
             if (res.data) {
-                setUsers(res.data);
+                setUsers(res.data.slice(0, 6));
+                setPages(Math.ceil(res.data?.length / 6));
+                setcurrentPage(1)
                 setOpenDialog(false);
                 NotificationManager.success(" User Deleted Successfully.", "Success", 5000)
             }
@@ -170,6 +172,7 @@ function Dashboard({ token }) {
                                     />
                                 </div>
                                 <InputBase
+                                    className='inputBase'
                                     placeholder="Search…"
                                     onChange={debouncedResults}
                                     inputProps={{ 'aria-label': 'search' }}
