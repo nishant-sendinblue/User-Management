@@ -28,8 +28,10 @@ function Adminlogin() {
         e.preventDefault()
         try {
             let res = await axios.post(`${API_URL}/login`, state);
+            console.log(res);
             if (res?.data?.token) {
                 localStorage.setItem("token", res?.data?.token);
+                localStorage.setItem("userId", res?.data?.user._id);
                 window.location = "/dashboard";
             }
         } catch (error) {

@@ -105,7 +105,7 @@ function Dashboard({ token }) {
 
     const handleUserSearchById = async () => {
         try {
-            let res = await axios.get(`${API_URL}/get_user_by_id/${searchByid}`, {
+            let res = await axios.get(`${API_URL}/user_by_id/${searchByid}`, {
                 headers: {
                     authorization: token
                 }

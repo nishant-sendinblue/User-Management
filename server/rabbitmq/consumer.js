@@ -1,13 +1,13 @@
 const amqp = require("amqplib");
 const nodemailer = require('nodemailer');
-
+require("dotenv").config();
 
 const SendMail = (email) => {
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'nishant007tech@gmail.com',
-            pass: 'rana254710@123'
+            user: process.env.EMAIL,
+            pass: process.env.PASS
         }
     });
 

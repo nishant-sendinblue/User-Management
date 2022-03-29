@@ -1,5 +1,6 @@
 const amqp = require("amqplib");
 const ConsumeMsg = require("./consumer");
+require("dotenv").config();
 
 const producer = async (email) => {
     try {
