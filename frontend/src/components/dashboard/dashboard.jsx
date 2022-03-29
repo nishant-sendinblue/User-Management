@@ -55,10 +55,8 @@ function Dashboard({ token }) {
                     authorization: token
                 }
             })
-            if (res.data) {
-                setUsers(res.data.slice(0, 6));
-                setPages(Math.ceil(res.data?.length / 6));
-                setcurrentPage(1)
+            if (res.status === 200) {
+                getData(currentPage);
                 setOpenDialog(false);
                 NotificationManager.success(" User Deleted Successfully.", "Success", 5000)
             }

@@ -56,8 +56,7 @@ const updateUserById = async (req, res) => {
 const deleteUserById = async (req, res) => {
     try {
         await userModel.deleteOne({ _id: req.params.id });
-        const Users = await userModel.find({}, { password: 0 });
-        res.json(Users);
+        res.status(200).json({ message: "User Deleted!" });
     } catch (error) {
         res.status(400).send(error)
     }
