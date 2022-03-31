@@ -1,42 +1,37 @@
 const amqp = require("amqplib");
-const nodemailer = require('nodemailer');
+const request = require('request');
 require("dotenv").config();
 
 const SendMail = (email) => {
-    let transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASS
-        }
-    });
+    console.log("sent to", email);
+    const options = {
+        method: 'POST',
+        url: 'https://in-automate.sendinblue.com/api/v2/identify',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'ma-key': process.env.MA_KEY
 
-    let mailOptions = {
-        from: 'nishant007tech@gmail.com',
-        to: email,
-        subject: 'Welcome to User Management System!',
-        text: `Welcome ${email} , Best of Luck!`
+        },
+        body: { email: email, attributes: { webapp: 'user management' } },
+        json: true
     };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
+    request(options, function (error, response, body) {
+        if (error) throw new Error(error);
     });
 }
-
-const consumer = async (queueName, email) => {
+const consumer = async () => {
     try {
         const conn = await amqp.connect(process.env.RMQ_URL);
         const channel = await conn.createChannel();
+        let queueName = "send_mail";
         channel.assertQueue(queueName, {
             durable: false
         });
         channel.consume(queueName, (msg) => {
-            console.log(`Message Subscribed: ${msg.content.toString()}`);
-            SendMail(email);
+            let data = JSON.parse(msg.content.toString())
+            console.log(`Message Subscribed:`, data["msg"]);
+            SendMail(data["email"]);
             channel.ack(msg);
         })
     } catch (error) {

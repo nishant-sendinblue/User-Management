@@ -20,7 +20,7 @@ function App() {
     if (token && userId) {
       //fetching LoggedIn user data
       const fetchData = async () => {
-        let res = await axios.get(`${API_URL}/user_by_id/${userId}`, {
+        let res = await axios.get(`${API_URL}/users/${userId}`, {
           headers: {
             "authorization": token
           }

@@ -21,7 +21,7 @@ function Edituser({ token }) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                let resData = await axios.get(`${API_URL}/user_by_id/${params?.id}`, {
+                let resData = await axios.get(`${API_URL}/users/${params?.id}`, {
                     headers: {
                         Authorization: token
                     }
@@ -51,7 +51,7 @@ function Edituser({ token }) {
     const submitHandler = async (e) => {
         e.preventDefault()
         try {
-            let resData = await axios.patch(`${API_URL}/edit_user/${params.id}`, state, {
+            let resData = await axios.patch(`${API_URL}/users/${params.id}`, state, {
                 headers: {
                     authorization: token
                 }

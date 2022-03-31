@@ -13,7 +13,7 @@ function Viewuser({ token }) {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            let resData = await axios.get(`${API_URL}/user_by_id/${params?.id}`, {
+            let resData = await axios.get(`${API_URL}/users/${params?.id}`, {
                 headers: {
                     Authorization: token
                 }

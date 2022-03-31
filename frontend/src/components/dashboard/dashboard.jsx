@@ -51,7 +51,7 @@ function Dashboard({ token }) {
     }
     const handleAgree = async () => {
         try {
-            let res = await axios.delete(`${API_URL}/delete_user/${userId}`, {
+            let res = await axios.delete(`${API_URL}/users/${userId}`, {
                 headers: {
                     authorization: token
                 }
@@ -105,7 +105,7 @@ function Dashboard({ token }) {
 
     const handleUserSearchById = async () => {
         try {
-            let res = await axios.get(`${API_URL}/user_by_id/${searchByid}`, {
+            let res = await axios.get(`${API_URL}/users/${searchByid}`, {
                 headers: {
                     authorization: token
                 }

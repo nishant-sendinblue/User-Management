@@ -31,15 +31,8 @@ const createUser = async (req, res) => {
 
 const getUserById = async (req, res) => {
     try {
-        let key = req.params.id;
-        let dataFromRedis = await client.get(key);
-        if (dataFromRedis) {
-            return res.json(JSON.parse(dataFromRedis));
-        } else {
-            let user = await userModel.findOne({ _id: req.params.id }, { password: 0 })
-            client.setEx(key, 3600, JSON.stringify(user));
-            res.status(200).send(user);
-        }
+        let user = await userModel.findOne({ _id: req.params.id }, { password: 0 })
+        res.status(200).send(user);
     }
     catch (error) {
         res.status(500).send({ message: error.message });
