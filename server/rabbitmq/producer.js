@@ -5,6 +5,9 @@ require("dotenv").config();
 const producer = async (email) => {
     try {
         const conn = await amqp.connect(process.env.RMQ_URL);
+        conn.on('error', function (handle) {
+            reject(handle);
+        })
         const channel = await conn.createChannel();
         let queueName = "send_mail";
         let message = "Send Welcome mail to New User!"

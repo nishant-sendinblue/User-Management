@@ -27,6 +27,7 @@ function Dashboard({ token }) {
 
     const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
     const [searchByid, setSearchByid] = useState("");
     let listToDisplay = users;
     const [page, setPages] = useState(0);
@@ -79,6 +80,7 @@ function Dashboard({ token }) {
             })
             if (res.data) {
                 setUsers(res.data.results);
+                setAllUsers(res.data?.allUsers);
                 setPages(Math.ceil(res.data?.allUsers.length / 6));
             }
         }
@@ -93,7 +95,7 @@ function Dashboard({ token }) {
         setQuery(e.target.value);
     }
     if (query !== "") {
-        listToDisplay = users.filter((item) => {
+        listToDisplay = allUsers.filter((item) => {
             return item?.name.toLowerCase().includes(query.toLowerCase());
         });
     }
