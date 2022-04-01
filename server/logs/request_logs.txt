@@ -342,3 +342,7 @@
 [25/03/2022, 19:44:53] GET:/users?page=3&limit=6 200 0.006 ms
 [25/03/2022, 19:44:55] OPTIONS:/users?page=1&limit=6 200 0.005 ms
 [25/03/2022, 19:44:55] GET:/users?page=1&limit=6 200 0.006 ms
+[01/04/2022, 08:03:52] OPTIONS:/users?page=1&limit=6 200 0.098 ms
+[01/04/2022, 08:03:52] OPTIONS:/get_user 200 0.005 ms
+[01/04/2022, 08:03:52] GET:/users?page=1&limit=6 200 0.005 ms
+[01/04/2022, 08:03:52] GET:/get_user 200 0.004 ms
