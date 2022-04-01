@@ -56,7 +56,7 @@ const deleteUserById = async (req, res) => {
 }
 
 
-const fetchResults = async (limit, skipIndex, startDate, endDate, resultFor) => {
+const fetchResults = async (limit, skipIndex, resultFor, startDate, endDate, name) => {
     if (resultFor === "filterUserbyDate") {
         return await userModel.find({
             createdAt: {
@@ -69,7 +69,15 @@ const fetchResults = async (limit, skipIndex, startDate, endDate, resultFor) => 
             .lean()
             .skip(skipIndex)
             .exec();
-    } else {
+    } else if (resultFor === "searchUsers") {
+        return await userModel.find({ name: { $regex: name, $options: "$i" } })
+            .sort({ _id: 1 })
+            .limit(limit)
+            .lean()
+            .skip(skipIndex)
+            .exec();
+    }
+    else {
         return await userModel.find({}, { password: 0 })
             .sort({ _id: 1 })
             .limit(limit)
@@ -84,6 +92,7 @@ const filterUserByDate = async (req, res) => {
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
         const page = parseInt(req.query.page);
+        console.log((page));
         const limit = parseInt(req.query.limit);
         const skipIndex = (page - 1) * limit;
         const name = req.query.name;
@@ -99,18 +108,17 @@ const filterUserByDate = async (req, res) => {
                         $lte: new Date(endDate).toDateString() + " " + "24:00:00"
                     }
                 }).countDocuments();
-                let resultFor = "filterUserbyDate"
-                let results = await fetchResults(limit, skipIndex, startDate, endDate, resultFor);
+                let resultFor = "filterUserbyDate";
+                let results = await fetchResults(limit, skipIndex, startDate, endDate, resultFor, "");
                 client.setEx(key, 3600, JSON.stringify({ results: results, count: count }));
                 res.json({ results: results, count: count });
             }
         } else {
             try {
-                let users = await userModel.find({});
-                let filteredUsers = users.filter(item => (
-                    item.name.toLowerCase().includes(name.toLowerCase())
-                ))
-                res.status(200).json(filteredUsers);
+                let count = await userModel.find({ name: { $regex: name, $options: "$i" } }).countDocuments();
+                let resultFor = "searchUsers"
+                let results = await fetchResults(limit, skipIndex, resultFor, 0, 0, name);
+                res.status(200).json({ results: results, count: count });
             } catch (e) {
                 res.status(500).json({ message: "Error Occured" });
             }

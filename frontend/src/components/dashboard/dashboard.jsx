@@ -17,7 +17,6 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { NotificationManager } from 'react-notifications';
 import Pagination from '@mui/material/Pagination';
-import FilterbyDate from '../filterbyDate/filterbyDate';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import debouce from "lodash.debounce";
@@ -44,6 +43,7 @@ function Dashboard({ token }) {
     const [users, setUsers] = useState([]);
     // const [allUsers, setAllUsers] = useState([]);
     const [searchByid, setSearchByid] = useState("");
+    const [query, setquery] = useState("");
     const [datafor, setDatafor] = useState("");
     let listToDisplay = users;
     const [page, setPages] = useState(0);
@@ -86,8 +86,10 @@ function Dashboard({ token }) {
         setcurrentPage(value);
         if (datafor == "filteredUsers") {
             handleFilterApply(value)
-        } else {
+        } else if (datafor == "allUsers") {
             getData(value);
+        } else {
+            searchUsers(query, value);
         }
     };
     const getData = async (curPage) => {
@@ -109,17 +111,18 @@ function Dashboard({ token }) {
         }
     }
     // for searching user
-    const handleSearch = async (e) => {
+    const searchUsers = async (query, page) => {
         try {
-            if (e.target.value != "") {
-                let res = await axios.get(`${API_URL}/users/search?name=${e.target.value}`, {
+            if (query != "") {
+                let res = await axios.get(`${API_URL}/users/search?name=${query}&page=${page}&limit=6`, {
                     headers: {
                         authorization: token
                     }
-                })
+                });
                 if (res?.data) {
-                    setUsers(res?.data);
-                    setPages(0);
+                    setUsers(res?.data?.results);
+                    setDatafor("searchUsers");
+                    setPages(Math.ceil(res.data?.count / 6));
                 }
             } else {
                 getData();
@@ -127,6 +130,10 @@ function Dashboard({ token }) {
         } catch (error) {
             console.log(error);
         }
+    }
+    const handleSearch = async (e) => {
+        setquery(e.target.value);
+        searchUsers(e.target.value, 1);
     }
     const debouncedResults = useMemo(() => {
         return debouce(handleSearch, 300);
