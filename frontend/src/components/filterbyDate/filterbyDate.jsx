@@ -18,7 +18,7 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
-function FilterbyDate({ token, setUsers, setPages }) {
+function FilterbyDate({ token, setUsers, setDatafor, setPages, page }) {
     const [openPicker, setOpenPicker] = useState(false)
     const [state, setState] = useState([
         {
@@ -31,13 +31,14 @@ function FilterbyDate({ token, setUsers, setPages }) {
         setOpenPicker(!openPicker)
     }
     const handleFilterApply = async () => {
-        let res = await axios.get(`${API_URL}/users/filter?startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}`, {
+        let res = await axios.get(`${API_URL}/users/search?startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}&page=${page}&limit=6`, {
             headers: {
                 authorization: token
             }
         })
         if (res?.data?.length > 0) {
             setUsers(res?.data);
+            setDatafor("filteredUsers");
             setPages(0);
         } else {
             NotificationManager.info("No User Were Created or Found!", "Info", 5000)

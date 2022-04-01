@@ -7,9 +7,7 @@ router.post("/create_user", UserController.createUser);
 //login api for admin
 router.post("/login", AuthController.Login);
 //filter users by date range (when user is created)
-router.get("/users/filter", auth, UserController.filterUserByDate)
-//search user by name
-router.get("/users/search", auth, UserController.searchbyName);
+router.get("/users/search", auth, UserController.filterUserByDate)
 //api to get user by id
 router.get("/users/:id", auth, UserController.getUserById)
 //api to get users according to pagination or page limit

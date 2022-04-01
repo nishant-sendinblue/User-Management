@@ -54,23 +54,66 @@ const deleteUserById = async (req, res) => {
         res.status(400).send(error)
     }
 }
+
+
+const fetchResults = async (limit, skipIndex, startDate, endDate, resultFor) => {
+    if (resultFor === "filterUserbyDate") {
+        return await userModel.find({
+            createdAt: {
+                $gte: startDate,
+                $lte: new Date(endDate).toDateString() + " " + "24:00:00"
+            }
+        })
+            .sort({ _id: 1 })
+            .limit(limit)
+            .lean()
+            .skip(skipIndex)
+            .exec();
+    } else {
+        return await userModel.find({}, { password: 0 })
+            .sort({ _id: 1 })
+            .limit(limit)
+            .lean()
+            .skip(skipIndex)
+            .exec();
+    }
+}
+
 const filterUserByDate = async (req, res) => {
     try {
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
-        let key = "User-" + new Date(startDate).toDateString() + "-" + new Date(endDate).toDateString();
-        let dataFromRedis = await client.get(key);
-        if (dataFromRedis) {
-            return res.json(JSON.parse(dataFromRedis));
-        } else {
-            let results = await userModel.find({
+        const page = parseInt(req.query.page);
+        const limit = parseInt(req.query.limit);
+        const skipIndex = (page - 1) * limit;
+        const name = req.query.name;
+        if (startDate && endDate) {
+            // let key = "User-" + new Date(startDate).toDateString() + "-" + new Date(endDate).toDateString();
+            // let dataFromRedis = await client.get(key);
+            // if (dataFromRedis) {
+            //     return res.json(JSON.parse(dataFromRedis));
+            // } else {
+            let count = await userModel.find({
                 createdAt: {
                     $gte: startDate,
                     $lte: new Date(endDate).toDateString() + " " + "24:00:00"
                 }
-            }).lean()
-            client.setEx(key, 3600, JSON.stringify(results));
-            res.json(results);
+            }).countDocuments();
+            let resultFor = "filterUserbyDate"
+            let results = await fetchResults(limit, skipIndex, startDate, endDate, resultFor);
+            // client.setEx(key, 3600, JSON.stringify(results));
+            res.json({ results: results, count: count });
+            // }
+        } else {
+            try {
+                let users = await userModel.find({});
+                let filteredUsers = users.filter(item => (
+                    item.name.toLowerCase().includes(name.toLowerCase())
+                ))
+                res.status(200).json(filteredUsers);
+            } catch (e) {
+                res.status(500).json({ message: "Error Occured" });
+            }
         }
     } catch (error) {
         res.status(400).send(error)
@@ -82,26 +125,9 @@ const paginatedResults = async (req, res) => {
         const page = parseInt(req.query.page);
         const limit = parseInt(req.query.limit);
         const skipIndex = (page - 1) * limit;
-        let allUsers = await userModel.find({}, { password: 0 })
-        let results = await userModel.find({}, { password: 0 })
-            .sort({ _id: 1 })
-            .limit(limit)
-            .lean()
-            .skip(skipIndex)
-            .exec();
-        res.status(200).json({ results: results, allUsers: allUsers });
-    } catch (e) {
-        res.status(500).json({ message: "Error Occured" });
-    }
-};
-const searchbyName = async (req, res) => {
-    try {
-        const name = req.query.name;
-        let users = await userModel.find({});
-        let filteredUsers = users.filter(item => (
-            item.name.toLowerCase().includes(name.toLowerCase())
-        ))
-        res.status(200).json(filteredUsers);
+        let count = await userModel.find({}, { password: 0 }).countDocuments();
+        let results = await fetchResults(limit, skipIndex);
+        res.status(200).json({ results: results, count: count });
     } catch (e) {
         res.status(500).json({ message: "Error Occured" });
     }
@@ -112,6 +138,5 @@ module.exports = {
     deleteUserById,
     filterUserByDate,
     createUser,
-    paginatedResults,
-    searchbyName
+    paginatedResults
 }

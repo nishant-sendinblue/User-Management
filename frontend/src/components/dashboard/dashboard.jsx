@@ -22,13 +22,29 @@ import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import debouce from "lodash.debounce";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { DateRangePicker } from 'react-date-range';
+import Modal from '@mui/material/Modal';
+import { addDays } from 'date-fns';
+import Box from '@mui/material/Box';
 
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 600,
+    bgcolor: 'background.paper',
+    boxShadow: 24,
+    p: 4,
+};
 function Dashboard({ token }) {
 
     const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
-    const [allUsers, setAllUsers] = useState([]);
+    // const [allUsers, setAllUsers] = useState([]);
     const [searchByid, setSearchByid] = useState("");
+    const [datafor, setDatafor] = useState("");
     let listToDisplay = users;
     const [page, setPages] = useState(0);
     const [currentPage, setcurrentPage] = useState(1);
@@ -38,7 +54,6 @@ function Dashboard({ token }) {
     useEffect(() => {
         getData(currentPage);
     }, [])
-
     const handleDeleteUser = (id) => {
         setOpenDialog(true);
         setUserId(id);
@@ -69,7 +84,11 @@ function Dashboard({ token }) {
     }
     const handleChangePage = (event, value) => {
         setcurrentPage(value);
-        getData(value);
+        if (datafor == "filteredUsers") {
+            handleFilterApply(value)
+        } else {
+            getData(value);
+        }
     };
     const getData = async (curPage) => {
         try {
@@ -80,7 +99,8 @@ function Dashboard({ token }) {
             })
             if (res.data) {
                 setUsers(res.data.results);
-                setPages(Math.ceil(res.data?.allUsers.length / 6));
+                setDatafor("allusers")
+                setPages(Math.ceil(res.data?.count / 6));
             }
         }
         catch (error) {
@@ -134,7 +154,38 @@ function Dashboard({ token }) {
             getData();
         }
     }
-
+    const [openPicker, setOpenPicker] = useState(false)
+    const [state, setState] = useState([
+        {
+            startDate: new Date(),
+            endDate: addDays(new Date(), 7),
+            key: 'selection'
+        }
+    ]);
+    const handleOpenDate = () => {
+        setOpenPicker(!openPicker)
+    }
+    const handleFilterApply = async (value) => {
+        let res = await axios.get(`${API_URL}/users/search?startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}&page=${value}&limit=6`, {
+            headers: {
+                authorization: token
+            }
+        })
+        if (res?.data) {
+            setUsers(res?.data?.results);
+            setPages(Math.ceil(res.data?.count / 6));
+            setDatafor("filteredUsers");
+        } else {
+            NotificationManager.info("No User Were Created or Found!", "Info", 5000)
+        }
+        setOpenPicker(false);
+    }
+    const handleCloseDatePicker = () => {
+        setOpenPicker(false)
+    }
+    const handleDateChange = (item) => {
+        setState([item.selection])
+    }
 
     return (
         <div className='dashContainer'>
@@ -189,7 +240,31 @@ function Dashboard({ token }) {
                             </div>
                         </div>
                         {/* for searching user end */}
-                        <FilterbyDate token={token} setUsers={setUsers} setPages={setPages} page={currentPage} />
+                        <div>
+                            <Modal
+                                open={openPicker}
+                                onClose={handleCloseDatePicker}
+                            >
+                                <Box sx={style}>
+                                    <DateRangePicker
+                                        onChange={handleDateChange}
+                                        months={1}
+                                        ranges={state}
+                                        showPreview={true}
+                                    />
+                                    <span style={{ width: "0", margin: "0 auto", display: "block" }}>
+                                        <Button onClick={() => handleFilterApply(1)} variant="contained">
+                                            Apply
+                                        </Button>
+                                    </span>
+                                </Box>
+                            </Modal>
+                            <span>
+                                <Button onClick={handleOpenDate} variant="outlined" startIcon={<FilterAltIcon />}>
+                                    Filter users By date
+                                </Button>
+                            </span>
+                        </div>
                         < Link to={"/add_new_user"} >
                             <Button variant="outlined" startIcon={<PersonAddAltTwoToneIcon />}>
                                 Add User
