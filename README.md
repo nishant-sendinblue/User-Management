@@ -46,6 +46,7 @@ nodemon or node index.js
 1. Create Database user_management.
 2. Create collection users.
 3. Insert this document into users collection:
+
    ```
    {
        "name": "your_name",
@@ -58,4 +59,5 @@ nodemon or node index.js
     }
 
    ```
+
 4. Decrypted password is "nishant"

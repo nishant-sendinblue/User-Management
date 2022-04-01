@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { DateRangePicker } from 'react-date-range';
 import Modal from '@mui/material/Modal';
@@ -31,7 +31,7 @@ function FilterbyDate({ token, setUsers, setPages }) {
         setOpenPicker(!openPicker)
     }
     const handleFilterApply = async () => {
-        let res = await axios.get(`${API_URL}/get_users_by_date_range?startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}`, {
+        let res = await axios.get(`${API_URL}/users/search?startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}`, {
             headers: {
                 authorization: token
             }

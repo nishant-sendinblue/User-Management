@@ -4,9 +4,10 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const routes = require("./routes/routes");
 const LogMiddleware = require("./logs/setupLogging");
+
 require("dotenv").config();
 
-
+//mongo
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true }, () => {
     console.log('We Are Connected to DB');
 });
