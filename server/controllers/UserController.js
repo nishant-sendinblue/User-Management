@@ -76,6 +76,7 @@ const filterUserByDate = async (req, res) => {
         res.status(400).send(error)
     }
 }
+
 const paginatedResults = async (req, res) => {
     try {
         const page = parseInt(req.query.page);
@@ -93,12 +94,24 @@ const paginatedResults = async (req, res) => {
         res.status(500).json({ message: "Error Occured" });
     }
 };
-
+const searchbyName = async (req, res) => {
+    try {
+        const name = req.query.name;
+        let users = await userModel.find({});
+        let filteredUsers = users.filter(item => (
+            item.name.toLowerCase().includes(name.toLowerCase())
+        ))
+        res.status(200).json(filteredUsers);
+    } catch (e) {
+        res.status(500).json({ message: "Error Occured" });
+    }
+};
 module.exports = {
     getUserById,
     updateUserById,
     deleteUserById,
     filterUserByDate,
     createUser,
-    paginatedResults
+    paginatedResults,
+    searchbyName
 }

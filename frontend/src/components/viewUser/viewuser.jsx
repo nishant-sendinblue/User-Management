@@ -5,8 +5,6 @@ import { useParams } from 'react-router-dom';
 import { API_URL } from '../../config';
 import "./viewuser.css"
 
-//const Viewuser =({token})=>{}
-
 function Viewuser({ token }) {
     let params = useParams();
     const [user, setuser] = useState([]);
@@ -34,7 +32,7 @@ function Viewuser({ token }) {
                 <p><strong>Email: </strong>{user?.email}</p>
                 <p><strong>Status: </strong>{user?.status}</p>
                 <p><strong>Role: </strong>{user?.role}</p>
-                <p><strong>Created At: </strong>{new Date(user?.createdAt).toString() + "," + new Date(user?.createdAt).toLocaleTimeString()}</p>
+                <p><strong>Created At: </strong>{new Date(user?.createdAt).toDateString() + "," + new Date(user?.createdAt).toLocaleTimeString()}</p>
                 <p><strong>Updated At: </strong>{new Date(user?.updatedAt).toDateString() + "," + new Date(user?.updatedAt).toLocaleTimeString()}</p>
             </div>
         </div>

@@ -114,3 +114,6 @@ td span {
   background-color: rgb(242, 255, 255);
   padding: 0 32px 0 5px;
 }
+#action {
+  display: block;
+}

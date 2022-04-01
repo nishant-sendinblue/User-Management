@@ -80,7 +80,6 @@ function Dashboard({ token }) {
             })
             if (res.data) {
                 setUsers(res.data.results);
-                setAllUsers(res.data?.allUsers);
                 setPages(Math.ceil(res.data?.allUsers.length / 6));
             }
         }
@@ -90,14 +89,24 @@ function Dashboard({ token }) {
         }
     }
     // for searching user
-    const [query, setQuery] = useState("");
-    const handleSearch = (e) => {
-        setQuery(e.target.value);
-    }
-    if (query !== "") {
-        listToDisplay = allUsers.filter((item) => {
-            return item?.name.toLowerCase().includes(query.toLowerCase());
-        });
+    const handleSearch = async (e) => {
+        try {
+            if (e.target.value != "") {
+                let res = await axios.get(`${API_URL}/users/search?name=${e.target.value}`, {
+                    headers: {
+                        authorization: token
+                    }
+                })
+                if (res?.data) {
+                    setUsers(res?.data);
+                    setPages(0);
+                }
+            } else {
+                getData();
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
     const debouncedResults = useMemo(() => {
         return debouce(handleSearch, 300);
@@ -214,7 +223,7 @@ function Dashboard({ token }) {
                                         }
                                         <td id='role'>{item.role}</td>
                                         <td>
-                                            <Link to={`/view_user/${item._id}`} >
+                                            <Link id={item.role === "admin" ? "action" : ""} to={`/view_user/${item._id}`} >
                                                 <VisibilityTwoToneIcon color='primary' />
                                             </Link>
                                             {

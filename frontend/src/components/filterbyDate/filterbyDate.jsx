@@ -31,7 +31,7 @@ function FilterbyDate({ token, setUsers, setPages }) {
         setOpenPicker(!openPicker)
     }
     const handleFilterApply = async () => {
-        let res = await axios.get(`${API_URL}/users/search?startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}`, {
+        let res = await axios.get(`${API_URL}/users/filter?startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}`, {
             headers: {
                 authorization: token
             }
