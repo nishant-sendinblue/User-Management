@@ -14,13 +14,13 @@ import Edituser from './components/editUser/edituser';
 
 function App() {
   const [userData, setuserData] = useState()
+  let userId = localStorage.getItem("userId");
   let token = localStorage.getItem("token");
-  console.log(token);
   useEffect(() => {
-    if (token) {
+    if (token && userId) {
       //fetching LoggedIn user data
       const fetchData = async () => {
-        let res = await axios.get(`${API_URL}/get_user`, {
+        let res = await axios.get(`${API_URL}/users/${userId}`, {
           headers: {
             "authorization": token
           }
@@ -31,7 +31,6 @@ function App() {
       }
       fetchData();
     }
-
   }, [])
 
 

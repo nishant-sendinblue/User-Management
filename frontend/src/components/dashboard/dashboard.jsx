@@ -27,6 +27,7 @@ function Dashboard({ token }) {
 
     const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
     const [searchByid, setSearchByid] = useState("");
     let listToDisplay = users;
     const [page, setPages] = useState(0);
@@ -50,15 +51,13 @@ function Dashboard({ token }) {
     }
     const handleAgree = async () => {
         try {
-            let res = await axios.delete(`${API_URL}/delete_user/${userId}`, {
+            let res = await axios.delete(`${API_URL}/users/${userId}`, {
                 headers: {
                     authorization: token
                 }
             })
-            if (res.data) {
-                setUsers(res.data.slice(0, 6));
-                setPages(Math.ceil(res.data?.length / 6));
-                setcurrentPage(1)
+            if (res.status === 200) {
+                getData(currentPage);
                 setOpenDialog(false);
                 NotificationManager.success(" User Deleted Successfully.", "Success", 5000)
             }
@@ -81,6 +80,7 @@ function Dashboard({ token }) {
             })
             if (res.data) {
                 setUsers(res.data.results);
+                setAllUsers(res.data?.allUsers);
                 setPages(Math.ceil(res.data?.allUsers.length / 6));
             }
         }
@@ -95,7 +95,7 @@ function Dashboard({ token }) {
         setQuery(e.target.value);
     }
     if (query !== "") {
-        listToDisplay = users.filter((item) => {
+        listToDisplay = allUsers.filter((item) => {
             return item?.name.toLowerCase().includes(query.toLowerCase());
         });
     }
@@ -105,7 +105,7 @@ function Dashboard({ token }) {
 
     const handleUserSearchById = async () => {
         try {
-            let res = await axios.get(`${API_URL}/get_user_by_id/${searchByid}`, {
+            let res = await axios.get(`${API_URL}/users/${searchByid}`, {
                 headers: {
                     authorization: token
                 }
