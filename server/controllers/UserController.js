@@ -88,22 +88,22 @@ const filterUserByDate = async (req, res) => {
         const skipIndex = (page - 1) * limit;
         const name = req.query.name;
         if (startDate && endDate) {
-            // let key = "User-" + new Date(startDate).toDateString() + "-" + new Date(endDate).toDateString();
-            // let dataFromRedis = await client.get(key);
-            // if (dataFromRedis) {
-            //     return res.json(JSON.parse(dataFromRedis));
-            // } else {
-            let count = await userModel.find({
-                createdAt: {
-                    $gte: startDate,
-                    $lte: new Date(endDate).toDateString() + " " + "24:00:00"
-                }
-            }).countDocuments();
-            let resultFor = "filterUserbyDate"
-            let results = await fetchResults(limit, skipIndex, startDate, endDate, resultFor);
-            // client.setEx(key, 3600, JSON.stringify(results));
-            res.json({ results: results, count: count });
-            // }
+            let key = `User-${page} ` + new Date(startDate).toDateString() + "-" + new Date(endDate).toDateString();
+            let dataFromRedis = await client.get(key);
+            if (dataFromRedis) {
+                return res.json(JSON.parse(dataFromRedis));
+            } else {
+                let count = await userModel.find({
+                    createdAt: {
+                        $gte: startDate,
+                        $lte: new Date(endDate).toDateString() + " " + "24:00:00"
+                    }
+                }).countDocuments();
+                let resultFor = "filterUserbyDate"
+                let results = await fetchResults(limit, skipIndex, startDate, endDate, resultFor);
+                client.setEx(key, 3600, JSON.stringify({ results: results, count: count }));
+                res.json({ results: results, count: count });
+            }
         } else {
             try {
                 let users = await userModel.find({});
