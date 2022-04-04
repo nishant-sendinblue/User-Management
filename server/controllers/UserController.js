@@ -57,6 +57,7 @@ const deleteUserById = async (req, res) => {
 
 
 const fetchQueryResults = async (query, limit, skipIndex) => {
+    console.log(query);
     return await userModel.find(query, { password: 0 })
         .sort({ _id: 1 })
         .limit(limit)
@@ -79,28 +80,19 @@ const searchUsers = async (req, res) => {
                 $gte: startDate,
                 $lte: new Date(endDate).toDateString() + " " + "24:00:00"
             }
-            let key = `User-${page} ` + new Date(startDate).toDateString() + "-" + new Date(endDate).toDateString();
-            let dataFromRedis = await client.get(key);
-            if (dataFromRedis) {
-                return res.json(JSON.parse(dataFromRedis));
-            } else {
-                let count = await userModel.find(query).countDocuments();
-                let results = await fetchQueryResults(query, limit, skipIndex);
-                client.setEx(key, 3600, JSON.stringify({ results: results, count: count }));
-                res.json({ results: results, count: count });
-            }
+        } if (name) {
+            query.name = { $regex: name, $options: "$i" };
         }
-        if (name) {
-            try {
-                query.name = { $regex: name, $options: "$i" };
-                let count = await userModel.find(query).countDocuments();
-                let results = await fetchQueryResults(query, limit, skipIndex);
-                res.status(200).json({ results: results, count: count });
-            } catch (e) {
-                res.status(500).json({ message: "Error Occured" });
-            }
+        let key = `User-${page} ` + JSON.stringify(query);
+        let dataFromRedis = await client.get(key);
+        if (dataFromRedis) {
+            return res.json(JSON.parse(dataFromRedis));
+        } else {
+            let count = await userModel.find(query).countDocuments();
+            let results = await fetchQueryResults(query, limit, skipIndex);
+            client.setEx(key, 3600, JSON.stringify({ results: results, count: count }));
+            res.json({ results: results, count: count });
         }
-
     } catch (error) {
         res.status(400).send(error);
     }

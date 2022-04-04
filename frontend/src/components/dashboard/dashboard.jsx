@@ -85,7 +85,7 @@ function Dashboard({ token }) {
     const handleChangePage = (event, value) => {
         setcurrentPage(value);
         if (datafor == "filteredUsers") {
-            handleFilterApply(value)
+            handleFilterApply(query, value)
         } else if (datafor == "allUsers") {
             getData(value);
         } else {
@@ -111,10 +111,11 @@ function Dashboard({ token }) {
         }
     }
     // for searching user
-    const searchUsers = async (query, page) => {
+    const searchUsers = async (query, page, datafor) => {
         try {
+            let res;
             if (query != "") {
-                let res = await axios.get(`${API_URL}/users/search?name=${query}&page=${page}&limit=6`, {
+                res = await axios.get(`${API_URL}/users/search?name=${query}&page=${page}&limit=6`, {
                     headers: {
                         authorization: token
                     }
@@ -131,14 +132,13 @@ function Dashboard({ token }) {
             console.log(error);
         }
     }
-    const handleSearch = async (e) => {
+    const handleSearch = (e) => {
         setquery(e.target.value);
         searchUsers(e.target.value, 1);
     }
     const debouncedResults = useMemo(() => {
         return debouce(handleSearch, 300);
     }, []);
-
     const handleUserSearchById = async () => {
         try {
             let res = await axios.get(`${API_URL}/users/${searchByid}`, {
@@ -172,8 +172,8 @@ function Dashboard({ token }) {
     const handleOpenDate = () => {
         setOpenPicker(!openPicker)
     }
-    const handleFilterApply = async (value) => {
-        let res = await axios.get(`${API_URL}/users/search?startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}&page=${value}&limit=6`, {
+    const handleFilterApply = async (query, value) => {
+        let res = await axios.get(`${API_URL}/users/search?name=${query}&startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}&page=${value}&limit=6`, {
             headers: {
                 authorization: token
             }
@@ -260,7 +260,7 @@ function Dashboard({ token }) {
                                         showPreview={true}
                                     />
                                     <span style={{ width: "0", margin: "0 auto", display: "block" }}>
-                                        <Button onClick={() => handleFilterApply(1)} variant="contained">
+                                        <Button onClick={() => handleFilterApply(query, 1)} variant="contained">
                                             Apply
                                         </Button>
                                     </span>
