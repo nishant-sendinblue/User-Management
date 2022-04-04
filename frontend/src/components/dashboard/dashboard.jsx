@@ -101,7 +101,7 @@ function Dashboard({ token }) {
             })
             if (res.data) {
                 setUsers(res.data.results);
-                setDatafor("allusers")
+                setDatafor("allUsers")
                 setPages(Math.ceil(res.data?.count / 6));
             }
         }

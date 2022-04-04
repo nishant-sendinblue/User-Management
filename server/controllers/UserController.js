@@ -56,47 +56,53 @@ const deleteUserById = async (req, res) => {
 }
 
 
-const fetchResults = async (limit, skipIndex, resultFor, startDate, endDate, name) => {
-    if (resultFor === "filterUserbyDate") {
+const fetchQueryResults = async (query) => {
+    if (query.startDate && query.endDate) {
         return await userModel.find({
             createdAt: {
-                $gte: startDate,
-                $lte: new Date(endDate).toDateString() + " " + "24:00:00"
+                $gte: query.startDate,
+                $lte: new Date(query.endDate).toDateString() + " " + "24:00:00"
             }
         })
             .sort({ _id: 1 })
-            .limit(limit)
+            .limit(query.limit)
             .lean()
-            .skip(skipIndex)
-            .exec();
-    } else if (resultFor === "searchUsers") {
-        return await userModel.find({ name: { $regex: name, $options: "$i" } })
-            .sort({ _id: 1 })
-            .limit(limit)
-            .lean()
-            .skip(skipIndex)
+            .skip(query.skipIndex)
             .exec();
     }
-    else {
+    if (query.name) {
+        return await userModel.find({ name: { $regex: query.name, $options: "$i" } })
+            .sort({ _id: 1 })
+            .limit(query.limit)
+            .lean()
+            .skip(query.skipIndex)
+            .exec();
+    }
+    if (query.getUsers) {
         return await userModel.find({}, { password: 0 })
             .sort({ _id: 1 })
-            .limit(limit)
+            .limit(query.limit)
             .lean()
-            .skip(skipIndex)
+            .skip(query.skipIndex)
             .exec();
     }
 }
 
-const filterUserByDate = async (req, res) => {
+const searchUsers = async (req, res) => {
     try {
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
         const page = parseInt(req.query.page);
-        console.log((page));
         const limit = parseInt(req.query.limit);
         const skipIndex = (page - 1) * limit;
         const name = req.query.name;
+        //added limit and skipIndex in query obj. because they are common in all cases
+        let query = {};
+        query.limit = limit;
+        query.skipIndex = skipIndex;
         if (startDate && endDate) {
+            query.startDate = startDate;
+            query.endDate = endDate;
             let key = `User-${page} ` + new Date(startDate).toDateString() + "-" + new Date(endDate).toDateString();
             let dataFromRedis = await client.get(key);
             if (dataFromRedis) {
@@ -108,33 +114,38 @@ const filterUserByDate = async (req, res) => {
                         $lte: new Date(endDate).toDateString() + " " + "24:00:00"
                     }
                 }).countDocuments();
-                let resultFor = "filterUserbyDate";
-                let results = await fetchResults(limit, skipIndex, startDate, endDate, resultFor, "");
+                let results = await fetchQueryResults(query);
                 client.setEx(key, 3600, JSON.stringify({ results: results, count: count }));
                 res.json({ results: results, count: count });
             }
-        } else {
+        }
+        if (name) {
             try {
+                query.name = name;
                 let count = await userModel.find({ name: { $regex: name, $options: "$i" } }).countDocuments();
-                let resultFor = "searchUsers"
-                let results = await fetchResults(limit, skipIndex, resultFor, 0, 0, name);
+                let results = await fetchQueryResults(query);
                 res.status(200).json({ results: results, count: count });
             } catch (e) {
                 res.status(500).json({ message: "Error Occured" });
             }
         }
+
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).send(error);
     }
 }
 
-const paginatedResults = async (req, res) => {
+const getUsers = async (req, res) => {
     try {
         const page = parseInt(req.query.page);
         const limit = parseInt(req.query.limit);
         const skipIndex = (page - 1) * limit;
+        let query = {};
+        query.limit = limit;
+        query.skipIndex = skipIndex;
+        query.getUsers = "getUsers";
         let count = await userModel.find({}, { password: 0 }).countDocuments();
-        let results = await fetchResults(limit, skipIndex);
+        let results = await fetchQueryResults(query);
         res.status(200).json({ results: results, count: count });
     } catch (e) {
         res.status(500).json({ message: "Error Occured" });
@@ -144,7 +155,7 @@ module.exports = {
     getUserById,
     updateUserById,
     deleteUserById,
-    filterUserByDate,
+    searchUsers,
     createUser,
-    paginatedResults
+    getUsers
 }
