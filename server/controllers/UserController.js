@@ -56,36 +56,13 @@ const deleteUserById = async (req, res) => {
 }
 
 
-const fetchQueryResults = async (query) => {
-    if (query.startDate && query.endDate) {
-        return await userModel.find({
-            createdAt: {
-                $gte: query.startDate,
-                $lte: new Date(query.endDate).toDateString() + " " + "24:00:00"
-            }
-        })
-            .sort({ _id: 1 })
-            .limit(query.limit)
-            .lean()
-            .skip(query.skipIndex)
-            .exec();
-    }
-    if (query.name) {
-        return await userModel.find({ name: { $regex: query.name, $options: "$i" } })
-            .sort({ _id: 1 })
-            .limit(query.limit)
-            .lean()
-            .skip(query.skipIndex)
-            .exec();
-    }
-    if (query.getUsers) {
-        return await userModel.find({}, { password: 0 })
-            .sort({ _id: 1 })
-            .limit(query.limit)
-            .lean()
-            .skip(query.skipIndex)
-            .exec();
-    }
+const fetchQueryResults = async (query, limit, skipIndex) => {
+    return await userModel.find(query, { password: 0 })
+        .sort({ _id: 1 })
+        .limit(limit)
+        .lean()
+        .skip(skipIndex)
+        .exec();
 }
 
 const searchUsers = async (req, res) => {
@@ -96,34 +73,28 @@ const searchUsers = async (req, res) => {
         const limit = parseInt(req.query.limit);
         const skipIndex = (page - 1) * limit;
         const name = req.query.name;
-        //added limit and skipIndex in query obj. because they are common in all cases
         let query = {};
-        query.limit = limit;
-        query.skipIndex = skipIndex;
         if (startDate && endDate) {
-            query.startDate = startDate;
-            query.endDate = endDate;
+            query.createdAt = {
+                $gte: startDate,
+                $lte: new Date(endDate).toDateString() + " " + "24:00:00"
+            }
             let key = `User-${page} ` + new Date(startDate).toDateString() + "-" + new Date(endDate).toDateString();
             let dataFromRedis = await client.get(key);
             if (dataFromRedis) {
                 return res.json(JSON.parse(dataFromRedis));
             } else {
-                let count = await userModel.find({
-                    createdAt: {
-                        $gte: startDate,
-                        $lte: new Date(endDate).toDateString() + " " + "24:00:00"
-                    }
-                }).countDocuments();
-                let results = await fetchQueryResults(query);
+                let count = await userModel.find(query).countDocuments();
+                let results = await fetchQueryResults(query, limit, skipIndex);
                 client.setEx(key, 3600, JSON.stringify({ results: results, count: count }));
                 res.json({ results: results, count: count });
             }
         }
         if (name) {
             try {
-                query.name = name;
-                let count = await userModel.find({ name: { $regex: name, $options: "$i" } }).countDocuments();
-                let results = await fetchQueryResults(query);
+                query.name = { $regex: name, $options: "$i" };
+                let count = await userModel.find(query).countDocuments();
+                let results = await fetchQueryResults(query, limit, skipIndex);
                 res.status(200).json({ results: results, count: count });
             } catch (e) {
                 res.status(500).json({ message: "Error Occured" });
@@ -141,11 +112,8 @@ const getUsers = async (req, res) => {
         const limit = parseInt(req.query.limit);
         const skipIndex = (page - 1) * limit;
         let query = {};
-        query.limit = limit;
-        query.skipIndex = skipIndex;
-        query.getUsers = "getUsers";
         let count = await userModel.find({}, { password: 0 }).countDocuments();
-        let results = await fetchQueryResults(query);
+        let results = await fetchQueryResults(query, limit, skipIndex);
         res.status(200).json({ results: results, count: count });
     } catch (e) {
         res.status(500).json({ message: "Error Occured" });
