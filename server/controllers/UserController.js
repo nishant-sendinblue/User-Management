@@ -54,26 +54,25 @@ const deleteUserById = async (req, res) => {
         res.status(400).send(error)
     }
 }
-
-
 const fetchQueryResults = async (query, limit, skipIndex) => {
-    console.log(query);
     return await userModel.find(query, { password: 0 })
         .sort({ _id: 1 })
+        .skip(skipIndex)
         .limit(limit)
         .lean()
-        .skip(skipIndex)
         .exec();
 }
 
 const searchUsers = async (req, res) => {
     try {
-        const startDate = req.query.startDate;
-        const endDate = req.query.endDate;
-        const page = parseInt(req.query.page);
-        const limit = parseInt(req.query.limit);
+        const {
+            startDate = null,
+            endDate = null,
+            name = null,
+            page = 1,
+            limit = 6
+        } = req.query;
         const skipIndex = (page - 1) * limit;
-        const name = req.query.name;
         let query = {};
         if (startDate && endDate) {
             query.createdAt = {
@@ -83,7 +82,7 @@ const searchUsers = async (req, res) => {
         } if (name) {
             query.name = { $regex: name, $options: "$i" };
         }
-        let key = `User-${page} ` + JSON.stringify(query);
+        let key = `User-${page}-` + JSON.stringify(query);
         let dataFromRedis = await client.get(key);
         if (dataFromRedis) {
             return res.json(JSON.parse(dataFromRedis));
@@ -100,8 +99,7 @@ const searchUsers = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const page = parseInt(req.query.page);
-        const limit = parseInt(req.query.limit);
+        const { page = 1, limit = 6 } = req.query;
         const skipIndex = (page - 1) * limit;
         let query = {};
         let count = await userModel.find({}, { password: 0 }).countDocuments();
