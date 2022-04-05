@@ -1,0 +1,2 @@
+[05/04/2022, 11:21:12] OPTIONS:/users?page=1&limit=6 200 0.077 ms
+[05/04/2022, 11:21:12] GET:/users?page=1&limit=6 200 0.005 ms
