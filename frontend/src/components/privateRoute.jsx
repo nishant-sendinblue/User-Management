@@ -8,10 +8,12 @@ function PrivateRoute({ component, path }) {
             return <Navigate to="/dashboard" />
         }
         return component;
-    } else if (path == "/dashboard") {
+    }
+    else if (path != "/") {
         return <Navigate to="/" />
-    } else {
-        return component
+    }
+    else {
+        return component;
     }
 }
 

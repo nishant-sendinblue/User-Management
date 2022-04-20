@@ -11,6 +11,7 @@ import { API_URL } from './config';
 import Addnewuser from './components/addnewUser/addnewuser';
 import Viewuser from './components/viewUser/viewuser';
 import Edituser from './components/editUser/edituser';
+import Profile from './components/profile/profile';
 
 function App() {
   const [userData, setuserData] = useState()
@@ -44,6 +45,7 @@ function App() {
         <Route exact path="/add_new_user" element={<PrivateRoute path="/add_new_user" component={<Addnewuser token={token} userData={userData} />} />} />
         <Route exact path="/view_user/:id" element={<PrivateRoute path="/view_user/:id" component={<Viewuser token={token} userData={userData} />} />} />
         <Route exact path="/edit_user/:id" element={<PrivateRoute path="/edit_user/:id" component={<Edituser token={token} userData={userData} />} />} />
+        <Route exact path="/profile/:id" element={<PrivateRoute path="/profile/:id" component={<Profile token={token} userData={userData} />} />} />
       </Routes>
     </Router>
   );

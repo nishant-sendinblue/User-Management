@@ -27,9 +27,16 @@ function Navbar({ userData }) {
                                 Welcome, {userData?.name}
                             </Link>
                         </p>
-                        <Button onClick={logoutHandler} variant="outlined" color="info" startIcon={<LogoutTwoToneIcon />}>
-                            Logout
-                        </Button>
+                        <p>
+                            <Link to={`/profile/${userData?._id}`}>
+                                <Button style={{ "marginRight": "10px" }} variant="outlined" startIcon={<ManageAccountsTwoToneIcon />}>
+                                    Profile
+                                </Button>
+                            </Link>
+                            <Button onClick={logoutHandler} variant="outlined" color="info" startIcon={<LogoutTwoToneIcon />}>
+                                Logout
+                            </Button>
+                        </p>
                     </div>
                     :
                     <div className="navbar">
