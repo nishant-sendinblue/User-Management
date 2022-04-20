@@ -20,7 +20,7 @@ import Pagination from '@mui/material/Pagination';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import debouce from "lodash.debounce";
-// import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { DateRangePicker } from 'react-date-range';
 import Modal from '@mui/material/Modal';
@@ -40,6 +40,8 @@ const style = {
 function Dashboard({ token }) {
     const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
+    // const [allUsers, setAllUsers] = useState([]);
+    const [searchByid, setSearchByid] = useState("");
     const [query, setquery] = useState("");
     const [datafor, setDatafor] = useState("");
     let listToDisplay = users;
@@ -139,7 +141,27 @@ function Dashboard({ token }) {
     const debouncedResults = useMemo(() => {
         return debouce(handleSearch, 300);
     }, []);
-
+    const handleUserSearchById = async () => {
+        try {
+            let res;
+            if (query != "") {
+                res = await axios.get(`${API_URL}/users/search?name=${query}&page=${page}&limit=6`, {
+                    headers: {
+                        authorization: token
+                    }
+                });
+                if (res?.data) {
+                    setUsers(res?.data?.results);
+                    setDatafor("searchUsers");
+                    setPages(Math.ceil(res.data?.count / 6));
+                }
+            } else {
+                getData();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const [openPicker, setOpenPicker] = useState(false)
     const [state, setState] = useState([
@@ -173,7 +195,6 @@ function Dashboard({ token }) {
     const handleDateChange = (item) => {
         setState([item.selection])
     }
-
     return (
         <div className='dashContainer'>
             <Dialog
