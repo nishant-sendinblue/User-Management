@@ -3,7 +3,7 @@ const request = require('request');
 require("dotenv").config();
 
 const SendMail = (email) => {
-    console.log("sent to", email);
+    console.log("Email sent to", email);
     const options = {
         method: 'POST',
         url: 'https://in-automate.sendinblue.com/api/v2/identify',
@@ -11,7 +11,6 @@ const SendMail = (email) => {
             Accept: 'application/json',
             'Content-Type': 'application/json',
             'ma-key': process.env.MA_KEY
-
         },
         body: { email: email, attributes: { webapp: 'user management' } },
         json: true
