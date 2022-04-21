@@ -162,47 +162,7 @@ function Dashboard({ token }) {
             console.log(error);
         }
     }
-    const handleSearch = (e) => {
-        setquery(e.target.value);
-        searchUsers(e.target.value, 1);
-    }
-    const debouncedResults = useMemo(() => {
-        return debouce(handleSearch, 300);
-    }, []);
 
-
-    const [openPicker, setOpenPicker] = useState(false)
-    const [state, setState] = useState([
-        {
-            startDate: new Date(),
-            endDate: addDays(new Date(), 7),
-            key: 'selection'
-        }
-    ]);
-    const handleOpenDate = () => {
-        setOpenPicker(!openPicker)
-    }
-    const handleFilterApply = async (query, value) => {
-        let res = await axios.get(`${API_URL}/users/search?name=${query}&startDate=${state[0]?.startDate}&endDate=${state[0]?.endDate}&page=${value}&limit=6`, {
-            headers: {
-                authorization: token
-            }
-        })
-        if (res?.data) {
-            setUsers(res?.data?.results);
-            setPages(Math.ceil(res.data?.count / 6));
-            setDatafor("filteredUsers");
-        } else {
-            NotificationManager.info("No User Were Created or Found!", "Info", 5000)
-        }
-        setOpenPicker(false);
-    }
-    const handleCloseDatePicker = () => {
-        setOpenPicker(false)
-    }
-    const handleDateChange = (item) => {
-        setState([item.selection])
-    }
     const [openPicker, setOpenPicker] = useState(false)
     const [state, setState] = useState([
         {
