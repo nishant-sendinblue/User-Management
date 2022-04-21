@@ -24,7 +24,7 @@ function Navbar({ userData }) {
                                 <PersonOutlineTwoToneIcon />
                             </Avatar>
                             <Link to="/dashboard">
-                                Welcome, {userData?.name}
+                                Welcome {userData?.role}, {userData?.name}
                             </Link>
                         </p>
                         <p>

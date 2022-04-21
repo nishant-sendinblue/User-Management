@@ -8,7 +8,7 @@ const Login = async (req, res) => {
     if (!user) {
         return res.status(400).json({ message: 'Email or Password is Wrong' });
     }
-    if (user?.role == "admin") {
+    if ((user?.role == "admin" || user?.role == "superAdmin") && user?.status == "active") {
         const validPass = await bcrypt.compare(password, user.password);
         if (!validPass) {
             return res.status(400).json({ message: 'Invalid Password or Email' });

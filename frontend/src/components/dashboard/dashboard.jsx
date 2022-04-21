@@ -20,7 +20,6 @@ import Pagination from '@mui/material/Pagination';
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import debouce from "lodash.debounce";
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { DateRangePicker } from 'react-date-range';
 import Modal from '@mui/material/Modal';
@@ -37,7 +36,7 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
-function Dashboard({ token }) {
+function Dashboard({ token, userData }) {
     const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
     // const [allUsers, setAllUsers] = useState([]);
@@ -141,28 +140,6 @@ function Dashboard({ token }) {
     const debouncedResults = useMemo(() => {
         return debouce(handleSearch, 300);
     }, []);
-    const handleUserSearchById = async () => {
-        try {
-            let res;
-            if (query != "") {
-                res = await axios.get(`${API_URL}/users/search?name=${query}&page=${page}&limit=6`, {
-                    headers: {
-                        authorization: token
-                    }
-                });
-                if (res?.data) {
-                    setUsers(res?.data?.results);
-                    setDatafor("searchUsers");
-                    setPages(Math.ceil(res.data?.count / 6));
-                }
-            } else {
-                getData();
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
     const [openPicker, setOpenPicker] = useState(false)
     const [state, setState] = useState([
         {
@@ -283,6 +260,7 @@ function Dashboard({ token }) {
                             <th>Email</th>
                             <th>Status</th>
                             <th>Role</th>
+                            <th>Created At</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -300,12 +278,14 @@ function Dashboard({ token }) {
                                             <td id='active'><FiberManualRecordTwoToneIcon color='error' fontSize="10" />InActive </td>
                                         }
                                         <td id='role'>{item.role}</td>
+                                        <td id='role'>{new Date(item.createdAt).toDateString()}</td>
                                         <td>
-                                            <Link id={item.role === "admin" ? "action" : ""} to={`/view_user/${item._id}`} >
+                                            <Link to={`/view_user/${item._id}`} >
                                                 <VisibilityTwoToneIcon color='primary' />
                                             </Link>
                                             {
-                                                item.role === "user" &&
+                                                (item?.role != "superAdmin" &&
+                                                    (item.role === "user" || userData?.role === "superAdmin")) &&
                                                 <>
                                                     <Link to={`/edit_user/${item._id}`}>
                                                         <ModeEditTwoToneIcon color='success' />
