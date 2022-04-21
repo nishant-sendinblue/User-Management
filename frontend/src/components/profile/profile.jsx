@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import './edituser.css'
+import './profile.css'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import axios from 'axios'
@@ -11,7 +11,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
 import MuiAlert from '@mui/material/Alert';
 
-function Edituser({ token }) {
+function Profile({ token }) {
     let params = useParams();
     const [showError, setShowError] = useState(false);
     const [errorMsg, seterrorMsg] = useState("");
@@ -21,7 +21,12 @@ function Edituser({ token }) {
         status: "",
         role: ""
     })
-
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            setShowError(false);
+        }
+        setShowError(false);
+    };
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -45,37 +50,21 @@ function Edituser({ token }) {
         }
         fetchUserData();
     }, [])
+
     const Validate = () => {
         let formValidated = true;
-        console.log(state);
-        if (state?.name.length < 5) {
+        if (state?.name?.length < 5) {
             seterrorMsg("Name atleast have 5 letters!")
             setShowError(true);
             formValidated = false;
         }
-        else if (!new RegExp(/^[a-zA-Z0-9_ ]*$/).test(state?.name)) {
+        else if (!new RegExp(/^[a-zA-Z0-9 ]*$/).test(state?.name)) {
             seterrorMsg("Name should not contain special characters")
-            setShowError(true);
-            formValidated = false;
-        }
-        else if (!new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(state?.email)) {
-            seterrorMsg("Enter a valid email address!")
-            setShowError(true);
-            formValidated = false;
-        } else if (state?.password.length < 6) {
-            seterrorMsg("Password should contains atleast 6 charaters")
             setShowError(true);
             formValidated = false;
         }
         return formValidated;
     }
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            setShowError(false);
-        }
-        setShowError(false);
-    };
 
     const changeHandler = (e) => {
         setState({
@@ -100,7 +89,7 @@ function Edituser({ token }) {
                         status: resData?.data?.status,
                         role: resData?.data?.role,
                     })
-                    NotificationManager.success(" User Updated Successfully.", "Success", 5000)
+                    NotificationManager.success(" Profile Updated Successfully.", "Success", 5000)
                 }
             }
         } catch (error) {
@@ -126,7 +115,7 @@ function Edituser({ token }) {
                         </MuiAlert>
                     </Snackbar >
                 }
-                <p id='heading'> Edit User </p>
+                <p id='heading'> Admin Profile </p>
                 <TextField
                     required={true}
                     type="text"
@@ -144,6 +133,7 @@ function Edituser({ token }) {
                     value={state?.email}
                     onChange={changeHandler}
                     label="Email"
+                    disabled={true}
                     name='email'
                     variant="outlined" />
                 <TextField
@@ -151,6 +141,7 @@ function Edituser({ token }) {
                     required={true}
                     type="text"
                     className='txtField'
+                    disabled={true}
                     onChange={changeHandler}
                     value={state?.status}
                     label="Status"
@@ -170,9 +161,13 @@ function Edituser({ token }) {
                     className='txtField'
                     onChange={changeHandler}
                     value={state?.role}
+                    disabled={true}
                     label="Role"
                     name='role'
                     variant="outlined" >
+                    <MenuItem key="superAdmin" value="superAdmin" >
+                        SuperAdmin
+                    </MenuItem>
                     <MenuItem key="admin" value="admin" >
                         Admin
                     </MenuItem>
@@ -180,10 +175,10 @@ function Edituser({ token }) {
                         User
                     </MenuItem>
                 </TextField>
-                <Button type='submit' onClick={submitHandler} variant="contained">Update User</Button>
+                <Button type='submit' onClick={submitHandler} variant="contained">Save</Button>
             </form>
         </div>
     )
 }
 
-export default Edituser
+export default Profile

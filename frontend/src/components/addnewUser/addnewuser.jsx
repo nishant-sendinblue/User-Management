@@ -19,13 +19,20 @@ function Addnewuser() {
         password: "",
         role: "user"
     });
-    const validate = () => {
+
+    const Validate = () => {
         let formValidated = true;
         if (state?.name.length < 5) {
             seterrorMsg("Name atleast have 5 letters!")
             setShowError(true);
             formValidated = false;
-        } else if (!new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(state?.email)) {
+        }
+        else if (!new RegExp(/^[a-zA-Z0-9_ ]*$/).test(state?.name)) {
+            seterrorMsg("Name should not contain special characters")
+            setShowError(true);
+            formValidated = false;
+        }
+        else if (!new RegExp(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/).test(state?.email)) {
             seterrorMsg("Enter a valid email address!")
             setShowError(true);
             formValidated = false;
@@ -45,7 +52,7 @@ function Addnewuser() {
     const submitHandler = async (e) => {
         e.preventDefault()
         try {
-            let isValidated = validate();
+            let isValidated = Validate();
             if (isValidated) {
                 let res = await axios.post(`${API_URL}/create_user`, state);
                 if (res.data) {
