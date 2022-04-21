@@ -53,7 +53,7 @@ function Edituser({ token }) {
             setShowError(true);
             formValidated = false;
         }
-        else if (!new RegExp(/^[a-zA-Z0-9_ ]*$/).test(state?.name)) {
+        else if (!new RegExp(/^[a-zA-Z0-9 ]*$/).test(state?.name)) {
             seterrorMsg("Name should not contain special characters")
             setShowError(true);
             formValidated = false;
