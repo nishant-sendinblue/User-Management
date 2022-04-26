@@ -5,14 +5,18 @@ import Button from '@mui/material/Button';
 import axios from 'axios'
 import { API_URL } from '../../config';
 import MenuItem from '@mui/material/MenuItem';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { NotificationManager } from 'react-notifications';
 import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
 import MuiAlert from '@mui/material/Alert';
+import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
+import Avatar from '@mui/material/Avatar';
+import { blue } from '@mui/material/colors';
 
-function Edituser({ token }) {
+function Edituser({ token,userData }) {
     let params = useParams();
+    const navigate = useNavigate();
     const [showError, setShowError] = useState(false);
     const [errorMsg, seterrorMsg] = useState("");
     const [state, setState] = useState({
@@ -44,7 +48,8 @@ function Edituser({ token }) {
             }
         }
         fetchUserData();
-    }, [])
+    }, [params?.id,token])
+
     const Validate = () => {
         let formValidated = true;
         console.log(state);
@@ -62,11 +67,7 @@ function Edituser({ token }) {
             seterrorMsg("Enter a valid email address!")
             setShowError(true);
             formValidated = false;
-        } else if (state?.password.length < 6) {
-            seterrorMsg("Password should contains atleast 6 charaters")
-            setShowError(true);
-            formValidated = false;
-        }
+        } 
         return formValidated;
     }
 
@@ -104,14 +105,18 @@ function Edituser({ token }) {
                 }
             }
         } catch (error) {
-            NotificationManager.error(" Some Error Occured!", "Error", 5000)
+            NotificationManager.error(error.response?.data?.message, "Error", 5000)
             throw Error(error);
-
         }
     }
 
     return (
         <div className='editContainer formContainer'>
+            <div className='backBtn'>
+                <Avatar onClick={()=> navigate(-1) } style={{ marginRight: "5px" }} sx={{ bgcolor: blue[100], color: blue[600] }}>
+                    <KeyboardBackspaceRoundedIcon  />
+                </Avatar>
+            </div>
             <form >
                 {showError &&
                     <Snackbar
@@ -163,7 +168,9 @@ function Edituser({ token }) {
                         InActive
                     </MenuItem>
                 </TextField>
-                <TextField
+                {
+                    userData?.role === "superAdmin"&&
+                    <TextField
                     select
                     required={true}
                     type="text"
@@ -180,6 +187,7 @@ function Edituser({ token }) {
                         User
                     </MenuItem>
                 </TextField>
+                    }
                 <Button type='submit' onClick={submitHandler} variant="contained">Update User</Button>
             </form>
         </div>

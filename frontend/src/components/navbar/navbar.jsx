@@ -13,7 +13,6 @@ function Navbar({ userData }) {
         localStorage.removeItem("token");
         window.location = "/"
     }
-
     return (
         <>
             {

@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 
 const Login = async (req, res) => {
     const { email, password } = req.body;
+    let users = await userModel.find({});
+    console.log(users)
     let user = await userModel.findOne({ email: email });
     if (!user) {
         return res.status(400).json({ message: 'Email or Password is Wrong' });
