@@ -40,10 +40,15 @@ const getUserById = async (req, res) => {
 }
 const updateUserById = async (req, res) => {
     try {
-        let updatedUser = await userModel.findByIdAndUpdate({ _id: req.params.id }, req.body, { new: true });
-        res.json(updatedUser);
+        let existingUser = await userModel.findOne({ email:  req.body.email});
+        if (existingUser?._id == req.params.id || !existingUser) {
+            let updatedUser = await userModel.findByIdAndUpdate({ _id: req.params.id }, req.body, { new: true });
+             res.json(updatedUser);
+        } else {
+             res.status(409).json({ message: "Email already exist!" })
+        }
     } catch (error) {
-        res.status(400).send(error)
+        res.status(400).send({message:"Something went wrong!"})
     }
 }
 const deleteUserById = async (req, res) => {
