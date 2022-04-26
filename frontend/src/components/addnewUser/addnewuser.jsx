@@ -9,9 +9,15 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Slide from '@mui/material/Slide';
 import { NotificationManager } from 'react-notifications';
+import Avatar from '@mui/material/Avatar';
+import { blue } from '@mui/material/colors';
+import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
+import { useNavigate } from 'react-router-dom';
 
-function Addnewuser() {
+
+function Addnewuser({userData}) {
     const [showError, setShowError] = useState(false);
+    const navigate = useNavigate();
     const [errorMsg, seterrorMsg] = useState("");
     const [state, setState] = useState({
         name: "",
@@ -27,7 +33,7 @@ function Addnewuser() {
             setShowError(true);
             formValidated = false;
         }
-        else if (!new RegExp(/^[a-zA-Z0-9_ ]*$/).test(state?.name)) {
+        else if (!new RegExp(/^[a-zA-Z0-9 ]*$/).test(state?.name)) {
             seterrorMsg("Name should not contain special characters")
             setShowError(true);
             formValidated = false;
@@ -36,7 +42,7 @@ function Addnewuser() {
             seterrorMsg("Enter a valid email address!")
             setShowError(true);
             formValidated = false;
-        } else if (state?.password.length < 6) {
+        } else if (state?.password?.length < 6) {
             seterrorMsg("Password should contains atleast 6 charaters")
             setShowError(true);
             formValidated = false;
@@ -78,6 +84,11 @@ function Addnewuser() {
     };
     return (
         <div className='formContainer'>
+            <div className='backBtn'>
+                <Avatar onClick={()=> navigate(-1) } style={{ marginRight: "5px" }} sx={{ bgcolor: blue[100], color: blue[600] }}>
+                    <KeyboardBackspaceRoundedIcon  />
+                </Avatar>
+            </div>
             <form >
                 {showError &&
                     <Snackbar
@@ -96,14 +107,17 @@ function Addnewuser() {
                 <TextField value={state?.name} required={true} type="text" className='txtField' onChange={changeHandler} label="Name" name='name' variant="outlined" />
                 <TextField value={state?.email} required={true} type="email" className='txtField' onChange={changeHandler} label="Email" name='email' variant="outlined" />
                 <TextField value={state?.password} required={true} className='txtField' onChange={changeHandler} label="Password" type="password" name='password' variant="outlined" />
-                <TextField select required={true} type="text" className='txtField' onChange={changeHandler} defaultValue="user" label="Role" name='role' variant="outlined" >
-                    <MenuItem key="admin" value="admin" >
-                        Admin
-                    </MenuItem>
-                    <MenuItem key="user" value="user">
-                        User
-                    </MenuItem>
-                </TextField>
+                {
+                userData?.role !== "admin" &&
+                    <TextField select required={true} type="text" className='txtField' onChange={changeHandler} defaultValue="user" label="Role" name='role' variant="outlined" >
+                        <MenuItem key="admin" value="admin" >
+                            Admin
+                        </MenuItem>
+                        <MenuItem key="user" value="user">
+                            User
+                        </MenuItem>
+                    </TextField>
+                }
                 <Button type='submit' onClick={submitHandler} variant="contained">Add User</Button>
             </form>
         </div>

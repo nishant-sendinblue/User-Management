@@ -30,6 +30,10 @@ services:
       MONGO_URI: mongodb://mongo:27017/user_management
       REDIS_URL: redis://redis-server:6379
       RMQ_URL: amqp://rabbitmq:5672
+      SECRET_JWT: NishantSecretKey
+      EMAIL: nishant007tech@gmail.com
+      PASS : rana254710@123
+      MA_KEY: 49uriefv7l0i1obekollxhpu
     ports:
       - '5000:5000'
     depends_on:
@@ -44,9 +48,9 @@ services:
     restart: always
     volumes:
       - ./server/mongo-volume:/data/db
+      - ./server/mongo-volume-configdb:/data/configdb
     ports:
       - '27017:27017'
 
 volumes:
   mongo: {}
-  
