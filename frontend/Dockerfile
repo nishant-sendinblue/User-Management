@@ -1,10 +1,10 @@
-FROM node:alpine
+FROM node:alpine as build
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /
 # Install app dependencies
 COPY package*.json ./
-RUN npm run build
 RUN npm ci
+RUN npm run build
 # Copy app source code
 COPY . .
 #Expose port and start application
