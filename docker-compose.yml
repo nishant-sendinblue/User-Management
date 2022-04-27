@@ -52,10 +52,12 @@ services:
   #nginx
   nginx:
     build:
-        context: ./nginx
-        dockerfile: Dockerfile
+      context: ./nginx
+      dockerfile: Dockerfile 
     ports: 
-        - 80:80
+      - 80:80
+    depends_on:
+      - server       
     restart: always
 
 volumes:
