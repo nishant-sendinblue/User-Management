@@ -13,6 +13,7 @@ EXPOSE 3000
 CMD ["npm", "start"]
 
 FROM nginx
-COPY --from=frontend /frontend/build /usr/share/nginx/html
-COPY ./default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /frontend/build /usr/share/nginx/html
+# COPY ./default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
+CMD nginx -g 'daemon off;'
