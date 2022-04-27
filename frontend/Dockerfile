@@ -11,3 +11,8 @@ RUN npm run build
 #Expose port and start application
 EXPOSE 3000
 CMD ["npm", "start"]
+
+FROM nginx
+COPY --from=frontend /frontend/build /usr/share/nginx/html
+COPY ./default.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
