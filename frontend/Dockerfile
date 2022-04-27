@@ -3,7 +3,7 @@ FROM node:alpine
 WORKDIR /usr/src/app
 # Install app dependencies
 COPY package*.json ./
-
+RUN npm run build
 RUN npm ci
 # Copy app source code
 COPY . .
