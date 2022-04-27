@@ -49,6 +49,14 @@ services:
       - ./server/mongo-volume-configdb:/data/configdb
     ports:
       - '27017:27017'
+  #nginx
+  nginx:
+    build:
+        context: ./nginx
+        dockerfile: Dockerfile
+    ports: 
+        - 3000:80
+    restart: always
 
 volumes:
   mongo: {}
