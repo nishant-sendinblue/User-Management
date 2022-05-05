@@ -25,6 +25,7 @@ import { DateRangePicker } from 'react-date-range';
 import Modal from '@mui/material/Modal';
 import { addDays } from 'date-fns';
 import Box from '@mui/material/Box';
+import { ThreeDots } from  'react-loader-spinner'
 
 const style = {
     position: 'absolute',
@@ -40,7 +41,7 @@ function Dashboard({ token, userData }) {
     const [oepnDialog, setOpenDialog] = useState(false)
     const [users, setUsers] = useState([]);
     // const [allUsers, setAllUsers] = useState([]);
-    const [searchByid, setSearchByid] = useState("");
+    const [loader, setLoader] = useState(false);
     const [query, setquery] = useState("");
     const [datafor, setDatafor] = useState("");
     let listToDisplay = users;
@@ -92,6 +93,7 @@ function Dashboard({ token, userData }) {
     };
     const getData = async (curPage) => {
         try {
+            setLoader(true);
             let res = await axios.get(`${API_URL}/users?page=${curPage}&limit=6`, {
                 headers: {
                     authorization: token
@@ -101,6 +103,7 @@ function Dashboard({ token, userData }) {
                 setUsers(res.data.results);
                 setDatafor("allUsers")
                 setPages(Math.ceil(res.data?.count / 6));
+                setLoader(false)
             } else {
                 setcurrentPage(curPage - 1);
                 getData(curPage - 1);
@@ -195,7 +198,6 @@ function Dashboard({ token, userData }) {
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <div className='innerDashContent'>
                 <div className='aboveTable'>
                     <div className='child1'>
@@ -266,7 +268,19 @@ function Dashboard({ token, userData }) {
                     </thead>
                     <tbody>
                         {
-                            listToDisplay.length > 0 ?
+                            loader ?
+                            <tr>
+                                <td>
+                                    <ThreeDots
+                                        height="15"
+                                        width="200"
+                                        color='#1976d2'
+                                        ariaLabel='loading'
+                                    />
+                                </td>
+                            </tr>
+                            :
+                            (listToDisplay.length > 0 ?
                                 listToDisplay.map((item, index) => (
                                     <tr key={item._id}>
                                         <td>{indexofFirstPost + index + 1}</td>
@@ -302,6 +316,7 @@ function Dashboard({ token, userData }) {
                                 <tr>
                                     <td>No Data to Show!</td>
                                 </tr>
+                            )
                         }
 
 

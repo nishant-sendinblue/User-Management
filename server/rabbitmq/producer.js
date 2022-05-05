@@ -3,8 +3,9 @@ const ConsumeMsg = require("./consumer");
 require("dotenv").config();
 
 const producer = async (email) => {
+    let conn=null;
     try {
-        const conn = await amqp.connect(process.env.RMQ_URL);
+        conn= await amqp.connect(process.env.RMQ_URL);
         const channel = await conn.createChannel();
         let queueName = "send_mail"
         let message = {
@@ -17,11 +18,13 @@ const producer = async (email) => {
         channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)));
         console.log(`Message Published: ${message.msg}`);
         ConsumeMsg();
+    } catch (error) {
+        throw Error(error);
+    }finally{
         setTimeout(() => {
             conn.close();
-        }, 1000);
-    } catch (error) {
-        throw Error(error)
+        }, 3000);
     }
+       
 }
 module.exports = producer
