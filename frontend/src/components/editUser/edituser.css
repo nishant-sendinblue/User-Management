@@ -2,5 +2,5 @@
     display: flex;
     margin: 10px 50px;
     cursor: pointer;
-    justify-content: end;
+    justify-content: start;
 }

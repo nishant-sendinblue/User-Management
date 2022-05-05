@@ -12,7 +12,6 @@ import Addnewuser from './components/addnewUser/addnewuser';
 import Viewuser from './components/viewUser/viewuser';
 import Edituser from './components/editUser/edituser';
 import Profile from './components/profile/profile';
-
 function App() {
   const [userData, setuserData] = useState()
   let userId = localStorage.getItem("userId");
@@ -30,10 +29,10 @@ function App() {
           setuserData(res.data);
         }
       }
+
       fetchData();
     }
-  }, [])
-
+  }, [userId,token])
 
   return (
     <Router>

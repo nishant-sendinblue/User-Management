@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import 'react-notifications/lib/notifications.css';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
+// import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 ReactDOM.render(
   <React.StrictMode>
