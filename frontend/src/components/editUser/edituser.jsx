@@ -13,11 +13,13 @@ import MuiAlert from '@mui/material/Alert';
 import KeyboardBackspaceRoundedIcon from '@mui/icons-material/KeyboardBackspaceRounded';
 import Avatar from '@mui/material/Avatar';
 import { blue } from '@mui/material/colors';
+import Loader from '../loader';
 
 function Edituser({ token,userData }) {
     let params = useParams();
     const navigate = useNavigate();
     const [showError, setShowError] = useState(false);
+    const [loader, setLoader] = useState(false);
     const [errorMsg, seterrorMsg] = useState("");
     const [state, setState] = useState({
         name: "",
@@ -29,6 +31,7 @@ function Edituser({ token,userData }) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
+                setLoader(true);
                 let resData = await axios.get(`${API_URL}/users/${params?.id}`, {
                     headers: {
                         Authorization: token
@@ -41,6 +44,7 @@ function Edituser({ token,userData }) {
                         status: resData?.data?.status,
                         role: resData?.data?.role,
                     })
+                    setLoader(false)
                 }
             } catch (error) {
                 NotificationManager.error(" Some Error Occured!", "Error", 5000)
@@ -118,6 +122,7 @@ function Edituser({ token,userData }) {
                 </Avatar>
             </div>
             <form >
+               
                 {showError &&
                     <Snackbar
                         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -131,6 +136,11 @@ function Edituser({ token,userData }) {
                         </MuiAlert>
                     </Snackbar >
                 }
+                 {
+               loader ?
+               <Loader/>
+               :
+            <>
                 <p id='heading'> Edit User </p>
                 <TextField
                     required={true}
@@ -189,6 +199,8 @@ function Edituser({ token,userData }) {
                 </TextField>
                     }
                 <Button type='submit' onClick={submitHandler} variant="contained">Update User</Button>
+            </>
+            }
             </form>
         </div>
     )

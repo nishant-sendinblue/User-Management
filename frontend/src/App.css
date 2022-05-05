@@ -7,3 +7,9 @@ body {
 a {
   text-decoration: none;
 }
+
+.loader{
+  position: absolute;
+  left: auto;
+  top: 40%;
+}
