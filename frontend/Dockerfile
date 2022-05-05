@@ -1,9 +1,9 @@
-FROM node:alpine
+#stage 1
+FROM node:alpine AS builder
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /frontend
 # Install app dependencies
-COPY package*.json .
-
+COPY package*.json ./
 RUN npm ci
 # Copy app source code
 COPY . /frontend/
