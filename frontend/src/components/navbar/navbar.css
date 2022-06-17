@@ -1,0 +1,26 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  box-shadow: 0 0 2px 1px #c5d8eb;
+}
+.navbar #name {
+  font-size: 20px;
+  text-transform: uppercase;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.navbar #name2 {
+  font-size: 20px;
+  text-transform: uppercase;
+  color: #1976d2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#name a {
+  color: #1976d2;
+}

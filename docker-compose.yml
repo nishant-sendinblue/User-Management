@@ -1,0 +1,73 @@
+version: '3'
+
+services:
+  #rabbit mq
+  rabbitmq:
+    image: rabbitmq
+    networks:
+      - nishant  
+    ports:
+        - 5672:5672
+        - 15672:15672
+  # #redis
+  redis-server: 
+    restart: always
+    image: redis:6.0-alpine
+    networks:
+      - nishant  
+    volumes:
+      - ./server/redis-volume:/data
+    ports:
+      - '6379:6379'
+  #frontend
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    hostname: frontend
+    ports:
+      - '3000:3000'
+    networks:
+      - nishant  
+    depends_on:
+      - mongo
+  # backend
+  server:
+    build: ./server
+    container_name: server
+    hostname: server
+    environment:
+      MONGO_URI: mongodb://localhost:27017/user_management
+      REDIS_URL: redis://redis-server:6379
+      RMQ_URL: amqp://rabbitmq:5672
+      SECRET_JWT: NishantSecretKey
+      MA_KEY: 49uriefv7l0i1obekollxhpu
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongo
+      - redis-server
+      - rabbitmq
+    networks:
+      - nishant
+
+  #nginx
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile 
+    hostname: nginx  
+    ports: 
+      - 80:80
+    depends_on:
+      - server
+      - frontend       
+    restart: always
+    networks:
+      - nishant
+      
+networks:
+  nishant:
+
+volumes:
+  mongo: {}
+

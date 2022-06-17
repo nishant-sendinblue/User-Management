@@ -1,0 +1,19 @@
+.adminContainer {
+  height: 100vh;
+}
+.adminContainer form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 5%;
+}
+.adminContainer form .txtField {
+  width: 350px;
+  margin: 10px 0;
+}
+#heading {
+  font-size: 39px;
+  font-weight: 300;
+  margin: 0px 0px 20px 0;
+}

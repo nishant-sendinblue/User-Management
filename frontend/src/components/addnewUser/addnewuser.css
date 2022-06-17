@@ -1,0 +1,13 @@
+.formContainer {
+  height: 87.5vh;
+}
+.formContainer form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+.formContainer form .txtField {
+  width: 400px;
+  margin: 10px 0;
+}
